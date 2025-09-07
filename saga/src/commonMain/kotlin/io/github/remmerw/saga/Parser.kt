@@ -63,7 +63,7 @@ class HtmlParser {
             return TOKEN_EOD
         }
         if (textSb.isNotEmpty()) {
-            val decText: StringBuffer = entityDecode(textSb)
+            val decText: StringBuilder = entityDecode(textSb)
             val textNode: Node = doc.createText(decText.toString())
             safeAppendChild(parent, textNode)
         }
@@ -79,7 +79,7 @@ class HtmlParser {
                     when (tag) {
                         "!--" -> {
                             val comment = this.passEndOfComment(source)
-                            val decText: StringBuffer = entityDecode(comment)
+                            val decText: StringBuilder = entityDecode(comment)
 
                             safeAppendChild(parent, doc.createComment(decText.toString()))
 
@@ -302,8 +302,8 @@ class HtmlParser {
     }
 
 
-    private fun readUpToTagBegin(source: Source): StringBuffer? {
-        var sb: StringBuffer? = null
+    private fun readUpToTagBegin(source: Source): StringBuilder? {
+        var sb: StringBuilder? = null
 
         while (!source.exhausted()) {
             val ch = source.readCodePointValue().toChar()
@@ -312,12 +312,12 @@ class HtmlParser {
                 this.justReadTagEnd = false
                 this.justReadEmptyElement = false
                 if (sb == null) {
-                    sb = StringBuffer(0)
+                    sb = StringBuilder(0)
                 }
                 return sb
             }
             if (sb == null) {
-                sb = StringBuffer()
+                sb = StringBuilder()
             }
             sb.append(ch)
         }
@@ -334,7 +334,7 @@ class HtmlParser {
     ): Int {
         val doc = this.model
         var intCh: Int
-        var sb = StringBuffer()
+        var sb = StringBuilder()
         while ((reader.readCodePointValue().also { intCh = it }) != -1) {
             var ch = intCh.toChar()
             if (ch == '<') {
@@ -342,7 +342,7 @@ class HtmlParser {
                 if (intCh != -1) {
                     ch = intCh.toChar()
                     if (ch == '/') {
-                        val tempBuffer = StringBuffer()
+                        val tempBuffer = StringBuilder()
                         while ((reader.readCodePointValue().also { intCh = it }) != -1) {
                             ch = intCh.toChar()
                             if (ch == '>') {
@@ -411,7 +411,7 @@ class HtmlParser {
 
 
     private suspend fun readTag(parent: Node, reader: Source): String {
-        val sb = StringBuffer()
+        val sb = StringBuilder()
         var chInt: Int
         chInt = reader.readCodePointValue()
         if (chInt != -1) {
@@ -419,7 +419,7 @@ class HtmlParser {
             var ch: Char
             LOOP@ while (true) {
                 ch = chInt.toChar()
-                if (Character.isLetter(ch)) {
+                if (ch.isLetter()) {
                     // Speed up normal case
                     break
                 } else if (ch == '!') {
@@ -452,7 +452,7 @@ class HtmlParser {
                         cont = false
                     }
                 } else if (ch == '<') {
-                    val ltText = StringBuffer(3)
+                    val ltText = StringBuilder(3)
                     ltText.append('<')
                     while ((reader.readCodePointValue().also { chInt = it }) == '<'.code) {
                         ltText.append('<')
@@ -466,8 +466,8 @@ class HtmlParser {
                     } else {
                         continue@LOOP
                     }
-                } else if (Character.isWhitespace(ch)) {
-                    val ltText = StringBuffer()
+                } else if (ch.isWhitespace()) {
+                    val ltText = StringBuilder()
                     ltText.append('<')
                     ltText.append(ch)
                     while ((reader.readCodePointValue().also { chInt = it }) != -1) {
@@ -492,7 +492,7 @@ class HtmlParser {
             if (cont) {
                 var lastCharSlash = false
                 while (true) {
-                    if (Character.isWhitespace(ch)) {
+                    if (ch.isWhitespace()) {
                         break
                     } else if (ch == '>') {
                         this.justReadTagEnd = true
@@ -527,11 +527,11 @@ class HtmlParser {
     }
 
 
-    private fun passEndOfComment(reader: Source): StringBuffer {
+    private fun passEndOfComment(reader: Source): StringBuilder {
         if (this.justReadTagEnd) {
-            return StringBuffer(0)
+            return StringBuilder(0)
         }
-        val sb = StringBuffer()
+        val sb = StringBuilder()
         OUTER@ while (true) {
             var chInt = reader.readCodePointValue()
             if (chInt == -1) {
@@ -546,7 +546,7 @@ class HtmlParser {
                 }
                 ch = chInt.toChar()
                 if (ch == '-') {
-                    var extra: StringBuffer? = null
+                    var extra: StringBuilder? = null
                     while (true) {
                         chInt = reader.readCodePointValue()
                         if (chInt == -1) {
@@ -563,13 +563,13 @@ class HtmlParser {
                         } else if (ch == '-') {
                             // Allow any number of dashes at the end
                             if (extra == null) {
-                                extra = StringBuffer()
+                                extra = StringBuilder()
                                 extra.append("--")
                             }
                             extra.append("-")
-                        } else if (Character.isWhitespace(ch)) {
+                        } else if (ch.isWhitespace()) {
                             if (extra == null) {
-                                extra = StringBuffer()
+                                extra = StringBuilder()
                                 extra.append("--")
                             }
                             extra.append(ch)
@@ -650,8 +650,8 @@ class HtmlParser {
     }
 
 
-    private fun readProcessingInstruction(reader: Source): StringBuffer {
-        val pidata = StringBuffer()
+    private fun readProcessingInstruction(reader: Source): StringBuilder {
+        val pidata = StringBuilder()
         if (this.justReadTagEnd) {
             return pidata
         }
@@ -674,7 +674,7 @@ class HtmlParser {
 
         // Read attribute name up to '=' character.
         // May read several attribute names without explicit values.
-        var attributeName: StringBuffer? = null
+        var attributeName: StringBuilder? = null
         var blankFound = false
         var lastCharSlash = false
         while (true) {
@@ -707,7 +707,7 @@ class HtmlParser {
             } else if (ch == '/') {
                 blankFound = true
                 lastCharSlash = true
-            } else if (Character.isWhitespace(ch)) {
+            } else if (ch.isWhitespace()) {
                 lastCharSlash = false
                 blankFound = true
             } else {
@@ -721,13 +721,13 @@ class HtmlParser {
                     }
                 }
                 if (attributeName == null) {
-                    attributeName = StringBuffer(6)
+                    attributeName = StringBuilder(6)
                 }
                 attributeName.append(ch)
             }
         }
         // Read blanks up to open quote or first non-blank.
-        var attributeValue: StringBuffer? = null
+        var attributeValue: StringBuilder? = null
         var openQuote = -1
         while (true) {
             val chInt = reader.readCodePointValue()
@@ -746,7 +746,7 @@ class HtmlParser {
                 return false
             } else if (ch == '/') {
                 lastCharSlash = true
-            } else if (Character.isWhitespace(ch)) {
+            } else if (ch.isWhitespace()) {
                 lastCharSlash = false
             } else {
                 when (ch) {
@@ -760,7 +760,7 @@ class HtmlParser {
 
                     else -> {
                         openQuote = -1
-                        attributeValue = StringBuffer(6)
+                        attributeValue = StringBuilder(6)
                         if (lastCharSlash) {
                             attributeValue.append('/')
                         }
@@ -788,7 +788,7 @@ class HtmlParser {
                         // processed by major browsers.
                         element.setAttribute(attributeNameStr, "")
                     } else {
-                        val actualAttributeValue: StringBuffer = entityDecode(attributeValue)
+                        val actualAttributeValue: StringBuilder = entityDecode(attributeValue)
                         element.setAttribute(attributeNameStr, actualAttributeValue.toString())
                     }
                 }
@@ -801,7 +801,7 @@ class HtmlParser {
                     if (attributeValue == null) {
                         element.setAttribute(attributeNameStr, "")
                     } else {
-                        val actualAttributeValue: StringBuffer = entityDecode(attributeValue)
+                        val actualAttributeValue: StringBuilder = entityDecode(attributeValue)
                         element.setAttribute(attributeNameStr, actualAttributeValue.toString())
                     }
                 }
@@ -809,14 +809,14 @@ class HtmlParser {
                 this.justReadTagEnd = true
                 this.justReadEmptyElement = lastCharSlash
                 return false
-            } else if ((openQuote == -1) && Character.isWhitespace(ch)) {
+            } else if ((openQuote == -1) && ch.isWhitespace()) {
                 lastCharSlash = false
                 if (attributeName != null) {
                     val attributeNameStr = attributeName.toString()
                     if (attributeValue == null) {
                         element.setAttribute(attributeNameStr, "")
                     } else {
-                        val actualAttributeValue: StringBuffer = entityDecode(attributeValue)
+                        val actualAttributeValue: StringBuilder = entityDecode(attributeValue)
                         element.setAttribute(attributeNameStr, actualAttributeValue.toString())
                     }
                 }
@@ -825,7 +825,7 @@ class HtmlParser {
                 return true
             } else {
                 if (attributeValue == null) {
-                    attributeValue = StringBuffer(6)
+                    attributeValue = StringBuilder(6)
                 }
                 if (lastCharSlash) {
                     attributeValue.append('/')
@@ -841,7 +841,7 @@ class HtmlParser {
             if (attributeValue == null) {
                 element.setAttribute(attributeNameStr, "")
             } else {
-                val actualAttributeValue: StringBuffer = entityDecode(attributeValue)
+                val actualAttributeValue: StringBuilder = entityDecode(attributeValue)
                 element.setAttribute(attributeNameStr, actualAttributeValue.toString())
             }
         }
@@ -1224,7 +1224,7 @@ class HtmlParser {
         }
 
 
-        private fun readCData(reader: Source, sb: StringBuffer) {
+        private fun readCData(reader: Source, sb: StringBuilder) {
             var next = reader.readCodePointValue()
 
             while (next >= 0) {
@@ -1271,14 +1271,14 @@ class HtmlParser {
             return if (i == 0) {
                 null
             } else {
-                String(chars, 0, i)
+                chars.concatToString(0, 0 + i)
             }
         }
 
 
-        private fun entityDecode(rawText: StringBuffer): StringBuffer {
+        private fun entityDecode(rawText: StringBuilder): StringBuilder {
             var startIdx = 0
-            var sb: StringBuffer? = null
+            var sb: StringBuilder? = null
             while (true) {
                 val ampIdx = rawText.indexOf("&", startIdx)
                 if (ampIdx == -1) {
@@ -1290,7 +1290,7 @@ class HtmlParser {
                     }
                 }
                 if (sb == null) {
-                    sb = StringBuffer()
+                    sb = StringBuilder()
                 }
                 sb.append(rawText.substring(startIdx, ampIdx))
                 val colonIdx = rawText.indexOf(";", ampIdx)
