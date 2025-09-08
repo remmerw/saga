@@ -1,23 +1,20 @@
 package io.github.remmerw.saga
 
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.transform
 import kotlin.concurrent.atomics.AtomicLong
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
 
 
-class Model() : Node(null, 0, "#document") {
+class Model() : Node(0, "#model") {
 
     @OptIn(ExperimentalAtomicApi::class)
     private val uids = AtomicLong(0L)
     private val nodes: MutableMap<Long, Node> = mutableMapOf()
-    private var doctype: DocumentType? = null
 
 
     init {
-        this.setModel(this)
+        addNode(this)
         this.nodes.put(0, this)
     }
 
@@ -36,42 +33,51 @@ class Model() : Node(null, 0, "#document") {
     }
 
 
-    internal fun getDoctype(): DocumentType? {
-        return this.doctype
-    }
-
-
-    internal fun setDoctype(doctype: DocumentType) {
-        this.doctype = doctype
-
-    }
-
     internal fun createElement(name: String): Element {
         val uid = this.nextUid()
-        return Element(this, uid, name)
+        val element = Element(uid, name)
+        addNode(element)
+        return element
     }
 
 
     internal fun createText(data: String): Text {
-        return Text(this, nextUid(), data)
+        val text = Text(nextUid(), data)
+        addNode(text)
+        return text
     }
 
     internal fun createComment(data: String): Comment {
-        return Comment(this, nextUid(), data)
+        val comment = Comment(nextUid(), data)
+        addNode(comment)
+        return comment
+    }
+
+    internal fun createDocumentType(
+        qualifiedName: String,
+        publicId: String?,
+        systemId: String?
+    ): DocumentType {
+        val docType = DocumentType(nextUid(), qualifiedName, publicId, systemId)
+        addNode(docType)
+        return docType
+
     }
 
     // todo
     internal fun createCDATASection(data: String): CDataSection {
-        return CDataSection(this, nextUid(), data)
+        val data = CDataSection(nextUid(), data)
+        addNode(data)
+        return data
     }
 
     internal fun createProcessingInstruction(
         name: String,
         data: String
     ): ProcessingInstruction {
-        return ProcessingInstruction(
-            this, nextUid(), name, data
-        )
+        val pi = ProcessingInstruction(nextUid(), name, data)
+        addNode(pi)
+        return pi
     }
 
 
@@ -108,7 +114,7 @@ class Model() : Node(null, 0, "#document") {
         return child.entity()
     }
 
-    suspend fun createText(parent: Entity, text: String) : Entity {
+    suspend fun createText(parent: Entity, text: String): Entity {
         val child = createText(text)
         nodes[parent.uid]!!.appendChild(child, true)
         return child.entity()
@@ -133,4 +139,38 @@ class Model() : Node(null, 0, "#document") {
     }
 
 
+    fun debug() {
+        debug(this)
+    }
+
+    internal fun debug(node: Node) {
+        val name = node.name
+        if (node is Element) {
+            if (node.getChildren().isEmpty()) {
+                println("<$name>")
+                if (node.hasAttributes()) {
+                    println("Attributes : " + node.attributes().toString())
+                }
+            } else {
+                println("<$name>")
+                if (node.hasAttributes()) {
+                    println("Attributes : " + node.attributes().toString())
+                }
+                node.getChildren().forEach { entity ->
+                    debug(node(entity))
+                }
+                println("</$name>")
+            }
+        } else {
+            if (node.getChildren().isEmpty()) {
+                println("<$name/>")
+            } else {
+                println("<$name>")
+                node.getChildren().forEach { entity ->
+                    debug(node(entity))
+                }
+                println("</$name>")
+            }
+        }
+    }
 }

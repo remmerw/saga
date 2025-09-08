@@ -3,7 +3,7 @@ package io.github.remmerw.saga
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
-internal class Element(model: Model, uid: Long, name: String) : Node(model, uid, name) {
+internal class Element(uid: Long, name: String) : Node(uid, name) {
     val attributes = MutableStateFlow(mutableMapOf<String, String>())
 
     fun attributes(): Map<String, String> {
@@ -41,21 +41,4 @@ internal class Element(model: Model, uid: Long, name: String) : Node(model, uid,
         }
     }
 
-    override fun debug() {
-        if (children.value.isEmpty()) {
-            println("<$name/>")
-            if (hasAttributes()) {
-                println("Attributes : " + attributes().toString())
-            }
-        } else {
-            println("<$name>")
-            if (hasAttributes()) {
-                println("Attributes : " + attributes().toString())
-            }
-            children.value.forEach { entity ->
-                model!!.node(entity).debug()
-            }
-            println("</$name>")
-        }
-    }
 }

@@ -93,15 +93,12 @@ class HtmlParser {
                                 val qName = group[1]
                                 val publicId = group[2]
                                 val systemId = group[3]
-                                val doctype = DocumentType(
-                                    doc,
-                                    doc.nextUid(),
+                                val doctype = doc.createDocumentType(
                                     qName,
                                     publicId,
                                     systemId
                                 )
-                                doc.setDoctype(doctype)
-                                isDocTypeXHTML = (doctype.name == "html")
+                                isDocTypeXHTML = (doctype.qualifiedName == "html")
                                         && (doctype.publicId == XHTML_STRICT_PUBLIC_ID)
                                         && (doctype.systemId == XHTML_STRICT_SYS_ID)
                             }

@@ -1,5 +1,5 @@
 package io.github.remmerw.saga
 
 
-internal class CDataSection(model: Model, uid: Long, text: String) :
-    CharacterData(model, uid, "#cdata-section", text)
+internal class CDataSection(uid: Long, text: String) :
+    CharacterData(uid, "#cdata-section", text)

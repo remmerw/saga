@@ -52,10 +52,8 @@ class ModelTest {
         model.removeAttribute(hello, "e")
         model.debug()
 
-
-
         println("remove entity hello")
-        model.removeEntity(entity = hello)
+        model.removeEntity(entity = hello.copy())
 
 
         model.debug()
