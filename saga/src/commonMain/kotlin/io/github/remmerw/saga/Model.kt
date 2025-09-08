@@ -1,6 +1,8 @@
 package io.github.remmerw.saga
 
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.transform
 import kotlin.concurrent.atomics.AtomicLong
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
@@ -81,6 +83,14 @@ class Model() : Node(null, 0, "#document") {
         return (nodes[entity.uid]!! as Element).getAttribute(name)
     }
 
+    fun getChildren(entity: Entity): List<Entity> {
+        return (nodes[entity.uid]!!).getChildren()
+    }
+
+    fun getChildren(entity: Entity, name: String): List<Entity> {
+        return (nodes[entity.uid]!!).getChildren().filter { entity -> entity.name == name }
+    }
+
     suspend fun setAttribute(entity: Entity, name: String, value: String) {
         require(entity != entity()) { "Model does not have attributes" }
         (nodes[entity.uid]!! as Element).setAttribute(name, value, true)
@@ -98,9 +108,10 @@ class Model() : Node(null, 0, "#document") {
         return child.entity()
     }
 
-    suspend fun createText(parent: Entity, text: String) {
-        val text = createText(name)
-        nodes[parent.uid]!!.appendChild(text, true)
+    suspend fun createText(parent: Entity, text: String) : Entity {
+        val child = createText(text)
+        nodes[parent.uid]!!.appendChild(child, true)
+        return child.entity()
     }
 
     suspend fun removeEntity(parent: Entity = entity(), entity: Entity) {

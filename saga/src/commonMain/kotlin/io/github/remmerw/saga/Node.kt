@@ -17,6 +17,11 @@ abstract class Node(
     val children = MutableStateFlow(mutableListOf<Entity>())
 
 
+    fun getChildren(): List<Entity> {
+        return children.value.toList()
+    }
+
+
     internal suspend fun appendChild(child: Node, emit: Boolean = false) {
         if (emit) {
             val list = this.children.value.toMutableList()

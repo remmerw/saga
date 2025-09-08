@@ -19,9 +19,24 @@ class ModelTest {
         )
         assertNotNull(hello)
 
-        model.createText(hello, "this is text")
+        val text = model.createText(hello, "this is text")
 
         model.debug()
+
+
+        var children = model.getChildren(hello, text.name)
+        assertEquals(children.size, 1)
+
+        children = model.getChildren(hello, "nope")
+        assertEquals(children.size, 0)
+
+        children = model.getChildren(hello)
+        assertEquals(children.size, 1)
+
+        model.removeEntity(hello, children.first())
+        children = model.getChildren(hello)
+        assertEquals(children.size, 0)
+
 
         println("set attribute e")
         model.setAttribute(hello, "e", "f")
