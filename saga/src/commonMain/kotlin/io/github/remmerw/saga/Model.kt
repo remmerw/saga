@@ -53,13 +53,14 @@ class Model() : Node(0, "#model") {
         return comment
     }
 
-    internal fun createDocumentType(
+    internal suspend fun createDocumentType(
         qualifiedName: String,
         publicId: String?,
         systemId: String?
     ): DocumentType {
         val docType = DocumentType(nextUid(), qualifiedName, publicId, systemId)
         addNode(docType)
+        appendChild(docType)
         return docType
 
     }

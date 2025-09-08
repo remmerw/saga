@@ -6,4 +6,4 @@ class DocumentType(
     val qualifiedName: String,
     val publicId: String?,
     val systemId: String?
-) : Node(uid, "#document_type")
+) : Node(uid, "#doctype")
