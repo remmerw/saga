@@ -98,6 +98,11 @@ class Model() : Node(null, 0, "#document") {
         return child.entity()
     }
 
+    suspend fun createText(parent: Entity, text: String) {
+        val text = createText(name)
+        nodes[parent.uid]!!.appendChild(text, true)
+    }
+
     suspend fun removeEntity(parent: Entity = entity(), entity: Entity) {
         val child = nodes[entity.uid]!!
         nodes[parent.uid]!!.removeChild(child, true)
@@ -112,8 +117,9 @@ class Model() : Node(null, 0, "#document") {
         return (nodes[entity.uid] as Element).attributes
     }
 
-    fun data(entity: Entity): StateFlow<String> {
+    fun text(entity: Entity): StateFlow<String> {
         return (nodes[entity.uid] as Text).data
     }
+
 
 }

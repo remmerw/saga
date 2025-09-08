@@ -19,6 +19,8 @@ class ModelTest {
         )
         assertNotNull(hello)
 
+        model.createText(hello, "this is text")
+
         model.debug()
 
         println("set attribute e")
