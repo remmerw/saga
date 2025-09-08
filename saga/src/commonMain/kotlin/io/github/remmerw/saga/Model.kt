@@ -146,17 +146,13 @@ class Model() : Node(0, "#model") {
 
     internal fun debug(node: Node) {
         val name = node.name
+
         if (node is Element) {
+            val attributes = debugAttributes(node)
             if (node.getChildren().isEmpty()) {
-                println("<$name>")
-                if (node.hasAttributes()) {
-                    println("Attributes : " + node.attributes().toString())
-                }
+                println("<$name $attributes>")
             } else {
-                println("<$name>")
-                if (node.hasAttributes()) {
-                    println("Attributes : " + node.attributes().toString())
-                }
+                println("<$name $attributes>")
                 node.getChildren().forEach { entity ->
                     debug(node(entity))
                 }
@@ -173,5 +169,12 @@ class Model() : Node(0, "#model") {
                 println("</$name>")
             }
         }
+    }
+    internal fun debugAttributes(element: Element) : String {
+        val result = StringBuilder()
+        element.attributes().forEach { (key, value) ->
+            result.append("$key=\"$value\" ")
+        }
+        return result.toString()
     }
 }
