@@ -41,10 +41,10 @@ class Model() : Node(0, "#model") {
     }
 
 
-    internal suspend fun createText(parent: Node, data: String, emit: Boolean = false): Text {
+    internal suspend fun createText(parent: Node, data: String): Text {
         val text = Text(nextUid(), data)
         addNode(text)
-        parent.appendChild(text, emit)
+        parent.appendChild(text)
         return text
     }
 
@@ -87,7 +87,7 @@ class Model() : Node(0, "#model") {
 
 
     suspend fun removeAttribute(entity: Entity, name: String) {
-        (nodes[entity.uid]!! as Element).removeAttribute(name, true)
+        (nodes[entity.uid]!! as Element).removeAttribute(name)
     }
 
     fun getAttribute(entity: Entity, name: String): String? {
@@ -104,30 +104,29 @@ class Model() : Node(0, "#model") {
 
     suspend fun setAttribute(entity: Entity, name: String, value: String) {
         require(entity != entity()) { "Model does not have attributes" }
-        (nodes[entity.uid]!! as Element).setAttribute(name, value, true)
+        (nodes[entity.uid]!! as Element).setAttribute(name, value)
     }
 
     suspend fun createEntity(
         name: String, parent: Entity = entity(),
         attributes: Map<String, String> = mapOf()
     ): Entity {
+        val parent = nodes[parent.uid]!!
         val child = createElement(name)
-        attributes.entries.forEach { (key, value) ->
-            child.setAttribute(key, value, false)
-        }
-        nodes[parent.uid]!!.appendChild(child, true)
+        child.setAttributes(attributes)
+        parent.appendChild(child)
         return child.entity()
     }
 
     suspend fun createText(parent: Entity, text: String): Entity {
         val parent = nodes[parent.uid]!!
-        val child = createText(parent, text, true)
+        val child = createText(parent, text)
         return child.entity()
     }
 
     suspend fun removeEntity(parent: Entity = entity(), entity: Entity) {
         val child = nodes[entity.uid]!!
-        nodes[parent.uid]!!.removeChild(child, true)
+        nodes[parent.uid]!!.removeChild(child)
         nodes.remove(entity.uid)
     }
 
