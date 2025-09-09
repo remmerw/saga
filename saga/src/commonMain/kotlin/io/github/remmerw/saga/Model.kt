@@ -141,40 +141,44 @@ class Model() : Node(0, "#model") {
 
 
     fun debug() {
-        debug(this)
+        debug(this, 0)
     }
 
-    internal fun debug(node: Node) {
+    internal fun debug(node: Node, spaces:Int) {
         val name = node.name
 
+        val space = if(spaces>0) "  ".repeat(spaces) else ""
         if (node is Element) {
             val attributes = debugAttributes(node)
             if (node.getChildren().isEmpty()) {
                 if(attributes.isEmpty()){
-                    println("<$name/>")
+                    println("$space<$name/>")
                 } else {
-                    println("<$name $attributes/>")
+                    println("$space<$name $attributes/>")
                 }
             } else {
                 if(attributes.isEmpty()){
-                    println("<$name>")
+                    println("$space<$name>")
                 } else {
-                    println("<$name $attributes>")
+                    println("$space<$name $attributes>")
                 }
                 node.getChildren().forEach { entity ->
-                    debug(node(entity))
+                    debug(node(entity), spaces + 1)
                 }
-                println("</$name>")
+                println("$space</$name>")
             }
+        } else if(node is Text){
+            require(node.getChildren().isEmpty()) {"Text has no children"}
+            println("$space<$name>" + node.getData() + "</$name>")
         } else {
             if (node.getChildren().isEmpty()) {
-                println("<$name/>")
+                println("$space<$name/>")
             } else {
-                println("<$name>")
+                println("$space<$name>")
                 node.getChildren().forEach { entity ->
-                    debug(node(entity))
+                    debug(node(entity), spaces + 1)
                 }
-                println("</$name>")
+                println("$space</$name>")
             }
         }
     }
