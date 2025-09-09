@@ -31,6 +31,9 @@ class HtmlParser {
         return isXML || (info == null || info.decodeEntities)
     }
 
+    fun purify(text: String): String {
+        return text.trimIndent().replace("\n", "").trim()
+    }
 
     suspend fun parse(source: Source) {
         parse(source, model)
@@ -64,8 +67,10 @@ class HtmlParser {
         }
         if (textSb.isNotEmpty()) {
             val decText: StringBuilder = entityDecode(textSb)
-            val textNode: Node = doc.createText(decText.toString())
-            safeAppendChild(parent, textNode)
+            val text = purify(decText.toString())
+            if (text.isNotEmpty()) {
+                doc.createText(parent, text)
+            }
         }
         if (this.justReadTagBegin) {
             var tag = this.readTag(parent, source)
@@ -81,7 +86,7 @@ class HtmlParser {
                             val comment = this.passEndOfComment(source)
                             val decText: StringBuilder = entityDecode(comment)
 
-                            safeAppendChild(parent, doc.createComment(decText.toString()))
+                            doc.createComment(parent, decText.toString())
 
                             return TOKEN_COMMENT
                         }
@@ -119,11 +124,7 @@ class HtmlParser {
                     tag = tag.substring(1)
                     val data = readProcessingInstruction(source)
 
-                    safeAppendChild(
-                        parent, doc.createProcessingInstruction(
-                            tag, data.toString()
-                        )
-                    )
+                    doc.createProcessingInstruction(parent, tag, data.toString())
 
                     return TOKEN_FULL_ELEMENT
                 } else {
@@ -353,10 +354,9 @@ class HtmlParser {
                                         if (decodeEntities) {
                                             sb = entityDecode(sb)
                                         }
-                                        val text = sb.toString()
+                                        val text = purify(sb.toString())
                                         if (text.isNotEmpty()) {
-                                            val textNode: Node = doc.createText(text)
-                                            safeAppendChild(parent, textNode)
+                                            doc.createText(parent, text)
                                         }
                                     }
                                     return TOKEN_END_ELEMENT
@@ -397,10 +397,9 @@ class HtmlParser {
             if (decodeEntities) {
                 sb = entityDecode(sb)
             }
-            val text = sb.toString()
+            val text = purify(sb.toString())
             if (text.isNotEmpty()) {
-                val textNode: Node = doc.createText(text)
-                safeAppendChild(parent, textNode)
+                doc.createText(parent, text)
             }
         }
         return TOKEN_EOD
@@ -455,8 +454,10 @@ class HtmlParser {
                         ltText.append('<')
                     }
                     val doc = this.model
-                    val textNode: Node = doc.createText(ltText.toString())
-                    parent.appendChild(textNode)
+                    val text = purify(ltText.toString())
+                    if (text.isNotEmpty()) {
+                        doc.createText(parent, text)
+                    }
 
                     if (chInt == -1) {
                         cont = false
@@ -476,8 +477,10 @@ class HtmlParser {
                         ltText.append(ch)
                     }
                     val doc = this.model
-                    val textNode: Node = doc.createText(ltText.toString())
-                    parent.appendChild(textNode)
+                    val text = purify(ltText.toString())
+                    if (text.isNotEmpty()) {
+                        doc.createText(parent, text)
+                    }
                     if (chInt == -1) {
                         cont = false
                     } else {

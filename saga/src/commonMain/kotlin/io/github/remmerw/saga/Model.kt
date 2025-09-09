@@ -41,15 +41,17 @@ class Model() : Node(0, "#model") {
     }
 
 
-    internal fun createText(data: String): Text {
+    internal suspend fun createText(parent: Node, data: String, emit: Boolean = false): Text {
         val text = Text(nextUid(), data)
         addNode(text)
+        parent.appendChild(text, emit)
         return text
     }
 
-    internal fun createComment(data: String): Comment {
+    internal suspend fun createComment(parent: Node, data: String): Comment {
         val comment = Comment(nextUid(), data)
         addNode(comment)
+        parent.appendChild(comment)
         return comment
     }
 
@@ -72,12 +74,14 @@ class Model() : Node(0, "#model") {
         return data
     }
 
-    internal fun createProcessingInstruction(
+    internal suspend fun createProcessingInstruction(
+        parent: Node,
         name: String,
         data: String
     ): ProcessingInstruction {
         val pi = ProcessingInstruction(nextUid(), name, data)
         addNode(pi)
+        parent.appendChild(pi)
         return pi
     }
 
@@ -116,8 +120,8 @@ class Model() : Node(0, "#model") {
     }
 
     suspend fun createText(parent: Entity, text: String): Entity {
-        val child = createText(text)
-        nodes[parent.uid]!!.appendChild(child, true)
+        val parent = nodes[parent.uid]!!
+        val child = createText(parent, text, true)
         return child.entity()
     }
 
@@ -144,20 +148,20 @@ class Model() : Node(0, "#model") {
         debug(this, 0)
     }
 
-    internal fun debug(node: Node, spaces:Int) {
+    internal fun debug(node: Node, spaces: Int) {
         val name = node.name
 
-        val space = if(spaces>0) "  ".repeat(spaces) else ""
+        val space = if (spaces > 0) "  ".repeat(spaces) else ""
         if (node is Element) {
             val attributes = debugAttributes(node)
             if (node.getChildren().isEmpty()) {
-                if(attributes.isEmpty()){
+                if (attributes.isEmpty()) {
                     println("$space<$name/>")
                 } else {
                     println("$space<$name $attributes/>")
                 }
             } else {
-                if(attributes.isEmpty()){
+                if (attributes.isEmpty()) {
                     println("$space<$name>")
                 } else {
                     println("$space<$name $attributes>")
@@ -167,8 +171,8 @@ class Model() : Node(0, "#model") {
                 }
                 println("$space</$name>")
             }
-        } else if(node is Text){
-            require(node.getChildren().isEmpty()) {"Text has no children"}
+        } else if (node is Text) {
+            require(node.getChildren().isEmpty()) { "Text has no children" }
             println("$space<$name>" + node.getData() + "</$name>")
         } else {
             if (node.getChildren().isEmpty()) {
@@ -182,7 +186,8 @@ class Model() : Node(0, "#model") {
             }
         }
     }
-    internal fun debugAttributes(element: Element) : String {
+
+    internal fun debugAttributes(element: Element): String {
         val result = StringBuilder()
         element.attributes().forEach { (key, value) ->
             result.append("$key=\"$value\" ")
