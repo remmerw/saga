@@ -150,9 +150,17 @@ class Model() : Node(0, "#model") {
         if (node is Element) {
             val attributes = debugAttributes(node)
             if (node.getChildren().isEmpty()) {
-                println("<$name $attributes>")
+                if(attributes.isEmpty()){
+                    println("<$name/>")
+                } else {
+                    println("<$name $attributes/>")
+                }
             } else {
-                println("<$name $attributes>")
+                if(attributes.isEmpty()){
+                    println("<$name>")
+                } else {
+                    println("<$name $attributes>")
+                }
                 node.getChildren().forEach { entity ->
                     debug(node(entity))
                 }
