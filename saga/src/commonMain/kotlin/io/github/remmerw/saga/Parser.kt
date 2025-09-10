@@ -1257,7 +1257,8 @@ class HtmlParser {
                 var ich: Int
                 try {
                     ich = reader.readCodePointValue()
-                } catch (_: Throwable) {
+                } catch (throwable: Throwable) {
+                    debug(throwable)
                     break
                 }
                 if (ich >= 0) {

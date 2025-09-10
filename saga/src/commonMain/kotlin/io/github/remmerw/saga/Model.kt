@@ -1,6 +1,7 @@
 package io.github.remmerw.saga
 
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.io.Source
 import kotlin.concurrent.atomics.AtomicLong
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
@@ -142,6 +143,10 @@ class Model() : Node(0, "#model") {
         return (nodes[entity.uid] as Text).data
     }
 
+    fun parse(source: Source) {
+        val parser = HtmlParser(model = this, isXML = false)
+        parser.parse(source)
+    }
 
     fun debug() {
         debug(this, 0)
