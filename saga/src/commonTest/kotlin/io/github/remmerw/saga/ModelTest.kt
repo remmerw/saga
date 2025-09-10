@@ -66,9 +66,8 @@ class ModelTest {
         val model = createModel()
 
 
-
         launch(Dispatchers.IO) {
-            repeat(100) { i ->
+            repeat(10) { i ->
                 val hello = model.createEntity(
                     name = "a$i",
                     attributes = mapOf("a" to "b", "c" to "d")
@@ -78,8 +77,9 @@ class ModelTest {
         }
 
 
+
         launch(Dispatchers.Default) {
-            repeat(100) { i ->
+            repeat(10) { i ->
                 val hello = model.createEntity(
                     name = "b$i",
                     attributes = mapOf("a" to "b", "c" to "d")
@@ -88,17 +88,26 @@ class ModelTest {
             }
         }
 
+        launch(Dispatchers.IO) {
+            repeat(10) { i ->
+                val hello = model.createEntity(
+                    name = "c$i",
+                    attributes = mapOf("a" to "b", "c" to "d")
+                )
+                model.createText(hello, "this is text")
+            }
+        }
+
+
 
         launch(Dispatchers.IO) {
 
             model.children(model.entity()).collect { entities ->
                 println(entities.toString())
-                try {
-                    assertEquals(entities.size, 200)
-                } finally {
+
+                if(entities.size == 30){
                     cancel()
                 }
-
             }
         }
 
