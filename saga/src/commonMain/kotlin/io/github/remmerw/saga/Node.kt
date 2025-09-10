@@ -1,31 +1,35 @@
 package io.github.remmerw.saga
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 
 abstract class Node(
     val uid: Long,
     val name: String
 ) {
-    val children = MutableStateFlow(mutableListOf<Entity>())
-
+    private val _children = MutableStateFlow(mutableListOf<Entity>())
+    val children = _children.asStateFlow()
 
     fun getChildren(): List<Entity> {
         return children.value.toList()
     }
 
 
-    internal suspend fun appendChild(child: Node) {
-        val list = this.children.value.toMutableList()
-        list.add(child.entity())
-        this.children.emit(list)
+    internal fun appendChild(child: Node) {
+        this._children.update {
+            val list = this.children.value.toMutableList()
+            list.add(child.entity())
+            list
+        }
     }
 
-    internal suspend fun removeChild(child: Node) {
-        val list = this.children.value.toMutableList()
-        val exists = list.remove(child.entity())
-        if (exists) {
-            this.children.emit(list)
+    internal fun removeChild(child: Node) {
+        this._children.update {
+            val list = this.children.value.toMutableList()
+            list.remove(child.entity())
+            list
         }
     }
 

@@ -1,10 +1,12 @@
 package io.github.remmerw.saga
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 internal abstract class CharacterData(uid: Long, name: String, text: String) : Node(uid, name) {
 
-    val data = MutableStateFlow(text)
+    private val _data = MutableStateFlow(text)
+    val data = _data.asStateFlow()
 
     fun getData(): String {
         return data.value

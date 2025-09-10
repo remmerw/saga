@@ -35,12 +35,12 @@ class HtmlParser {
         return text.trimIndent().replace("\n", "").trim()
     }
 
-    suspend fun parse(source: Source) {
+    fun parse(source: Source) {
         parse(source, model)
     }
 
 
-    suspend fun parse(source: Source, parent: Node) {
+    fun parse(source: Source, parent: Node) {
         while (this.parseToken(
                 parent, source, null,
                 ArrayDeque()
@@ -49,12 +49,12 @@ class HtmlParser {
         }
     }
 
-    private suspend fun safeAppendChild(parent: Node, child: Node) {
+    private fun safeAppendChild(parent: Node, child: Node) {
         parent.appendChild(child)
     }
 
 
-    private suspend fun parseToken(
+    private fun parseToken(
         parent: Node,
         source: Source,
         stopTags: MutableSet<String>?,
@@ -325,7 +325,7 @@ class HtmlParser {
         return sb
     }
 
-    private suspend fun parseForEndTag(
+    private fun parseForEndTag(
         parent: Node, reader: Source, tagName: String?,
         addTextNode: Boolean,
         decodeEntities: Boolean
@@ -406,7 +406,7 @@ class HtmlParser {
     }
 
 
-    private suspend fun readTag(parent: Node, reader: Source): String {
+    private fun readTag(parent: Node, reader: Source): String {
         val sb = StringBuilder()
         var chInt: Int
         chInt = reader.readCodePointValue()
@@ -667,7 +667,7 @@ class HtmlParser {
     }
 
 
-    private suspend fun readAttribute(reader: Source, element: Element): Boolean {
+    private fun readAttribute(reader: Source, element: Element): Boolean {
         if (this.justReadTagEnd) {
             return false
         }

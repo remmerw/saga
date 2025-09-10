@@ -41,21 +41,21 @@ class Model() : Node(0, "#model") {
     }
 
 
-    internal suspend fun createText(parent: Node, data: String): Text {
+    internal fun createText(parent: Node, data: String): Text {
         val text = Text(nextUid(), data)
         addNode(text)
         parent.appendChild(text)
         return text
     }
 
-    internal suspend fun createComment(parent: Node, data: String): Comment {
+    internal fun createComment(parent: Node, data: String): Comment {
         val comment = Comment(nextUid(), data)
         addNode(comment)
         parent.appendChild(comment)
         return comment
     }
 
-    internal suspend fun createDocumentType(
+    internal fun createDocumentType(
         qualifiedName: String,
         publicId: String?,
         systemId: String?
@@ -74,7 +74,7 @@ class Model() : Node(0, "#model") {
         return data
     }
 
-    internal suspend fun createProcessingInstruction(
+    internal fun createProcessingInstruction(
         parent: Node,
         name: String,
         data: String
@@ -86,7 +86,7 @@ class Model() : Node(0, "#model") {
     }
 
 
-    suspend fun removeAttribute(entity: Entity, name: String) {
+    fun removeAttribute(entity: Entity, name: String) {
         (nodes[entity.uid]!! as Element).removeAttribute(name)
     }
 
@@ -102,12 +102,12 @@ class Model() : Node(0, "#model") {
         return (nodes[entity.uid]!!).getChildren().filter { entity -> entity.name == name }
     }
 
-    suspend fun setAttribute(entity: Entity, name: String, value: String) {
+    fun setAttribute(entity: Entity, name: String, value: String) {
         require(entity != entity()) { "Model does not have attributes" }
         (nodes[entity.uid]!! as Element).setAttribute(name, value)
     }
 
-    suspend fun createEntity(
+    fun createEntity(
         name: String, parent: Entity = entity(),
         attributes: Map<String, String> = mapOf()
     ): Entity {
@@ -118,13 +118,13 @@ class Model() : Node(0, "#model") {
         return child.entity()
     }
 
-    suspend fun createText(parent: Entity, text: String): Entity {
+    fun createText(parent: Entity, text: String): Entity {
         val parent = nodes[parent.uid]!!
         val child = createText(parent, text)
         return child.entity()
     }
 
-    suspend fun removeEntity(parent: Entity = entity(), entity: Entity) {
+    fun removeEntity(parent: Entity = entity(), entity: Entity) {
         val child = nodes[entity.uid]!!
         nodes[parent.uid]!!.removeChild(child)
         nodes.remove(entity.uid)

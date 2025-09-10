@@ -8,6 +8,7 @@
 </div>
 
 ## Saga
+
 In-Memory Database Library
 
 ## Integration
@@ -18,7 +19,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             ...
-            implementation("io.github.remmerw:saga:0.0.7") 
+            implementation("io.github.remmerw:saga:0.0.8") 
         }
         ...
     }

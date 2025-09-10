@@ -2,6 +2,8 @@ package io.github.remmerw.saga
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -57,5 +59,48 @@ class ModelTest {
 
 
         model.debug()
+    }
+
+    @Test
+    fun parallelTest(): Unit = runBlocking(Dispatchers.Default) {
+        val model = createModel()
+
+
+
+        launch(Dispatchers.IO) {
+            repeat(100) { i ->
+                val hello = model.createEntity(
+                    name = "a$i",
+                    attributes = mapOf("a" to "b", "c" to "d")
+                )
+                model.createText(hello, "this is text")
+            }
+        }
+
+
+        launch(Dispatchers.Default) {
+            repeat(100) { i ->
+                val hello = model.createEntity(
+                    name = "b$i",
+                    attributes = mapOf("a" to "b", "c" to "d")
+                )
+                model.createText(hello, "this is text")
+            }
+        }
+
+
+        launch(Dispatchers.IO) {
+
+            model.children(model.entity()).collect { entities ->
+                println(entities.toString())
+                try {
+                    assertEquals(entities.size, 200)
+                } finally {
+                    cancel()
+                }
+
+            }
+        }
+
     }
 }
