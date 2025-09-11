@@ -148,50 +148,56 @@ class Model() : Node(0, "#model") {
         parser.parse(source)
     }
 
-    fun debug() {
-        debug(this, 0)
+    fun content(entity: Entity): String {
+        val result = StringBuilder()
+        nodes(result, nodes[entity.uid]!!, 0)
+        return result.toString()
     }
 
-    internal fun debug(node: Node, spaces: Int) {
-        val name = node.name
+    fun content(): String {
+        return content(entity())
+    }
+
+    internal fun nodes(builder:StringBuilder, node: Node, spaces: Int) {
+        val name = node.name.lowercase()
 
         val space = if (spaces > 0) "  ".repeat(spaces) else ""
         if (node is Element) {
-            val attributes = debugAttributes(node)
+            val attributes = attributes(node)
             if (node.getChildren().isEmpty()) {
                 if (attributes.isEmpty()) {
-                    println("$space<$name/>")
+                    builder.appendLine("$space<$name/>")
                 } else {
-                    println("$space<$name $attributes/>")
+                    builder.appendLine("$space<$name $attributes/>")
                 }
             } else {
                 if (attributes.isEmpty()) {
-                    println("$space<$name>")
+                    builder.appendLine("$space<$name>")
                 } else {
-                    println("$space<$name $attributes>")
+                    builder.appendLine("$space<$name $attributes>")
                 }
                 node.getChildren().forEach { entity ->
-                    debug(node(entity), spaces + 1)
+                    nodes(builder, node(entity), spaces + 1)
                 }
-                println("$space</$name>")
+                builder.appendLine("$space</$name>")
             }
         } else if (node is Text) {
             require(node.getChildren().isEmpty()) { "Text has no children" }
-            println("$space<$name>" + node.getData() + "</$name>")
+            builder.appendLine("$space<$name>" + node.getData() + "</$name>")
         } else {
             if (node.getChildren().isEmpty()) {
-                println("$space<$name/>")
+                builder.appendLine("$space<$name/>")
             } else {
-                println("$space<$name>")
+                builder.appendLine("$space<$name>")
                 node.getChildren().forEach { entity ->
-                    debug(node(entity), spaces + 1)
+                    nodes(builder, node(entity), spaces + 1)
                 }
-                println("$space</$name>")
+                builder.appendLine("$space</$name>")
             }
         }
     }
 
-    internal fun debugAttributes(element: Element): String {
+    internal fun attributes(element: Element): String {
         val result = StringBuilder()
         element.attributes().forEach { (key, value) ->
             result.append("$key=\"$value\" ")

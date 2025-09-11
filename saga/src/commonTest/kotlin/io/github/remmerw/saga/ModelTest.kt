@@ -23,7 +23,7 @@ class ModelTest {
 
         val text = model.createText(hello, "this is text")
 
-        model.debug()
+        println(model.content())
 
 
         var children = model.getChildren(hello, text.name)
@@ -42,7 +42,7 @@ class ModelTest {
 
         println("set attribute e")
         model.setAttribute(hello, "e", "f")
-        model.debug()
+        println(model.content())
 
         val e = model.getAttribute(hello, "e")
         assertEquals(e, "f")
@@ -52,13 +52,13 @@ class ModelTest {
 
         println("remove attribute e")
         model.removeAttribute(hello, "e")
-        model.debug()
+        println(model.content())
 
         println("remove entity hello")
         model.removeEntity(entity = hello.copy())
 
 
-        model.debug()
+        println(model.content(model.entity()))
     }
 
     @Test
