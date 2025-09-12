@@ -33,6 +33,42 @@ class Model() : Node(0, "#model") {
         return nodes[entity.uid]!!
     }
 
+    internal fun html(): Entity? {
+        return getChildren().firstOrNull { entity -> entity.name.lowercase() == "html" }
+    }
+
+    internal fun body(): Entity? {
+        val html = html()
+        if (html != null) {
+            return getChildren(html).firstOrNull { entity -> entity.name.lowercase() == "body" }
+        }
+        return null
+    }
+
+    internal fun head(): Entity? {
+        val html = html()
+        if (html != null) {
+            return getChildren(html).firstOrNull { entity -> entity.name.lowercase() == "head" }
+        }
+        return null
+    }
+
+    internal fun styles(): List<Entity> {
+        val html = head()
+        if (html != null) {
+            return getChildren(html).filter { entity -> entity.name.lowercase() == "style" }
+        }
+        return emptyList()
+    }
+
+    internal fun links(): List<Entity> {
+        val html = head()
+        if (html != null) {
+            return getChildren(html).filter { entity -> entity.name.lowercase() == "link" }
+        }
+        return emptyList()
+    }
+
 
     internal fun createElement(name: String): Element {
         val uid = this.nextUid()
@@ -114,7 +150,7 @@ class Model() : Node(0, "#model") {
     ): Entity {
         val parent = nodes[parent.uid]!!
         val child = createElement(name)
-        child.setAttributes(attributes)
+        child.addAttributes(attributes)
         parent.appendChild(child)
         return child.entity()
     }
@@ -139,6 +175,10 @@ class Model() : Node(0, "#model") {
         return (nodes[entity.uid] as Element).attributes
     }
 
+    fun properties(entity: Entity): StateFlow<Map<String, String>> {
+        return (nodes[entity.uid] as Element).properties
+    }
+
     fun text(entity: Entity): StateFlow<String> {
         return (nodes[entity.uid] as Text).data
     }
@@ -150,7 +190,7 @@ class Model() : Node(0, "#model") {
 
     fun content(entity: Entity): String {
         val result = StringBuilder()
-        nodes(result, nodes[entity.uid]!!, 0)
+        content(result, nodes[entity.uid]!!, 0)
         return result.toString()
     }
 
@@ -158,7 +198,15 @@ class Model() : Node(0, "#model") {
         return content(entity())
     }
 
-    internal fun nodes(builder:StringBuilder, node: Node, spaces: Int) {
+    suspend fun attachStylesheets(externalCSS: (suspend (link: String) -> String)? = null) {
+        attachStylesheets(this, externalCSS)
+    }
+
+    internal fun nodes(name: String): List<Node> {
+        return nodes.values.filter { node -> name.lowercase() == node.name.lowercase() } // todo lowercase
+    }
+
+    internal fun content(builder: StringBuilder, node: Node, spaces: Int) {
         val name = node.name.lowercase()
 
         val space = if (spaces > 0) "  ".repeat(spaces) else ""
@@ -177,7 +225,7 @@ class Model() : Node(0, "#model") {
                     builder.appendLine("$space<$name $attributes>")
                 }
                 node.getChildren().forEach { entity ->
-                    nodes(builder, node(entity), spaces + 1)
+                    content(builder, node(entity), spaces + 1)
                 }
                 builder.appendLine("$space</$name>")
             }
@@ -190,7 +238,7 @@ class Model() : Node(0, "#model") {
             } else {
                 builder.appendLine("$space<$name>")
                 node.getChildren().forEach { entity ->
-                    nodes(builder, node(entity), spaces + 1)
+                    content(builder, node(entity), spaces + 1)
                 }
                 builder.appendLine("$space</$name>")
             }

@@ -105,7 +105,7 @@ class ModelTest {
             model.children(model.entity()).collect { entities ->
                 println(entities.toString())
 
-                if(entities.size == 30){
+                if (entities.size == 30) {
                     cancel()
                 }
             }
