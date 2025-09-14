@@ -34,11 +34,11 @@ class Model() : Node(0, "#model") {
         return nodes[entity.uid]!!
     }
 
-    internal fun html(): Entity? {
+    fun html(): Entity? {
         return getChildren().firstOrNull { entity -> entity.name == Tag.HTML.tag() }
     }
 
-    internal fun body(): Entity? {
+    fun body(): Entity? {
         val html = html()
         if (html != null) {
             return getChildren(html).firstOrNull { entity -> entity.name == Tag.BODY.tag() }
@@ -46,7 +46,7 @@ class Model() : Node(0, "#model") {
         return null
     }
 
-    internal fun head(): Entity? {
+    fun head(): Entity? {
         val html = html()
         if (html != null) {
             return getChildren(html).firstOrNull { entity -> entity.name == Tag.HEAD.tag() }
@@ -54,7 +54,7 @@ class Model() : Node(0, "#model") {
         return null
     }
 
-    internal fun styles(): List<Entity> {
+    fun styles(): List<Entity> {
         val html = head()
         if (html != null) {
             return getChildren(html).filter { entity -> entity.name == Tag.STYLE.tag() }
@@ -62,14 +62,13 @@ class Model() : Node(0, "#model") {
         return emptyList()
     }
 
-    internal fun links(): List<Entity> {
+    fun links(): List<Entity> {
         val html = head()
         if (html != null) {
             return getChildren(html).filter { entity -> entity.name == Tag.LINK.tag() }
         }
         return emptyList()
     }
-
 
     internal fun createElement(name: String): Element {
         val uid = this.nextUid()
@@ -197,12 +196,22 @@ class Model() : Node(0, "#model") {
         return content(entity())
     }
 
+    internal fun normalize(node: Node) {
+        if (node is Element) {
+            style.normalize(node)
+        }
+    }
+
     fun normalize() {
-        val body = body()
-        if (body != null) {
-            style.handleNode(this, body)
-        } else {
-            debug("Document does not contains a body")
+
+        // remove all style tags without children
+        styles().forEach { entity ->
+            val node = node(entity)
+            if (!node.hasChildren()) {
+                head()?.let { head ->
+                    removeEntity(head, node.entity())
+                }
+            }
         }
     }
 

@@ -3,10 +3,6 @@ package io.github.remmerw.saga
 internal class Style {
     private val rules = mutableMapOf<String, MutableList<CSSRuleSet>>()
 
-    fun rules(): Map<String, List<CSSRuleSet>> {
-        return rules
-    }
-
     fun parseStyle(data: String) {
         if (data.isNotEmpty()) {
             parseCssRuleBlock(StyleOrigin.INTERNAL, data).forEach { rule ->
@@ -16,22 +12,15 @@ internal class Style {
     }
 
 
-    fun handleNode(model: Model, entity: Entity) {
-        val node = model.node(entity)
-        if (node is Element) {
-            if (!NOT_NORMALIZE.contains(node.name)) {
-                val cssDeclarations = buildFinalCSS(node)
-                val properties = mutableMapOf<String, String>()
-                cssDeclarations.forEach { declaration ->
-                    properties.put(declaration.property, declaration.value)
-                }
-                // remove class and style attribute
-                node.changeAttributes(listOf("class", "style"), properties)
-
-                node.getChildren().forEach { entity ->
-                    handleNode(model, entity)
-                }
+    fun normalize(element: Element) {
+        if (!NOT_NORMALIZE.contains(element.name)) {
+            val cssDeclarations = buildFinalCSS(element)
+            val properties = mutableMapOf<String, String>()
+            cssDeclarations.forEach { declaration ->
+                properties.put(declaration.property, declaration.value)
             }
+            // remove class and style attribute
+            element.changeAttributes(listOf("class", "style"), properties)
         }
     }
 

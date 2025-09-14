@@ -79,11 +79,11 @@ class CssTest {
 
         model.normalize()
 
-        val h1 = model.nodes("h1").firstOrNull()
+        val h1 = model.nodes(Tag.H1.tag()).firstOrNull()
         assertNotNull(h1)
         assertEquals((h1 as Element).getAttribute("color"), "blue")
 
-        val p = model.nodes("p").firstOrNull()
+        val p = model.nodes(Tag.P.tag()).firstOrNull()
         assertNotNull(p)
         assertEquals((p as Element).getAttribute("color"), "red")
     }
@@ -120,11 +120,11 @@ class CssTest {
         model.normalize()
 
 
-        val h1 = model.nodes("h1").firstOrNull()
+        val h1 = model.nodes(Tag.H1.tag()).firstOrNull()
         assertNotNull(h1)
         assertEquals((h1 as Element).getAttribute("color"), "blue")
 
-        val p = model.nodes("p")[1]
+        val p = model.nodes(Tag.P.tag())[1]
         assertNotNull(p)
         assertEquals((p as Element).getAttribute("color"), "green")
     }
@@ -136,7 +136,7 @@ class CssTest {
                 "<html>\n" +
                 "<head>\n" +
                 "<style>\n" +
-                "h1.intro {\n" +
+                "h2.intro {\n" +
                 "  color: blue;\n" +
                 "  text-align: center;\n" +
                 "}\n" +
@@ -148,7 +148,7 @@ class CssTest {
                 "</head>\n" +
                 "<body>\n" +
                 "\n" +
-                "<h1 class=\"intro important\">Header 1</h1>\n" +
+                "<h2 class=\"intro important\">Header 1</h1>\n" +
                 "<p>A paragraph.</p>\n" +
                 "\n" +
                 "</body>\n" +
@@ -163,7 +163,7 @@ class CssTest {
         model.normalize()
 
 
-        val h1 = model.nodes("h1").firstOrNull()
+        val h1 = model.nodes(Tag.H2.tag()).firstOrNull()
         assertNotNull(h1)
         assertEquals((h1 as Element).getAttribute("color"), "blue")
         assertEquals(h1.getAttribute("text-align"), "center")

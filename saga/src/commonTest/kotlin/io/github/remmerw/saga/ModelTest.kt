@@ -21,7 +21,7 @@ class ModelTest {
         )
         assertNotNull(hello)
 
-        val text = model.createText(hello, "this is text")
+        model.createText(hello, "this is text")
 
         println(model.content())
 

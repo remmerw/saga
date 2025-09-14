@@ -16,6 +16,9 @@ abstract class Node(
         return _children.value.toList()
     }
 
+    fun hasChildren(): Boolean {
+        return _children.value.isNotEmpty()
+    }
 
     internal fun appendChild(child: Node) {
         this._children.update {

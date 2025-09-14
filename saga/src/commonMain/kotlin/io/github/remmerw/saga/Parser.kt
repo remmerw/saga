@@ -49,7 +49,8 @@ class HtmlParser {
         }
     }
 
-    private fun safeAppendChild(parent: Node, child: Node) {
+    private fun safeAppendChild(model: Model, parent: Node, child: Node) {
+        model.normalize(child)
         parent.appendChild(child)
     }
 
@@ -60,7 +61,7 @@ class HtmlParser {
         stopTags: MutableSet<String>?,
         ancestors: ArrayDeque<String>
     ): Int {
-        val doc = this.model
+        val model = this.model
         val textSb = this.readUpToTagBegin(source)
         if (textSb == null) {
             return TOKEN_EOD
@@ -69,7 +70,7 @@ class HtmlParser {
             val decText: StringBuilder = entityDecode(textSb)
             val text = purify(decText.toString())
             if (text.isNotEmpty()) {
-                doc.createText(parent, text)
+                model.createText(parent, text)
             }
         }
         if (this.justReadTagBegin) {
@@ -86,7 +87,7 @@ class HtmlParser {
                             val comment = this.passEndOfComment(source)
                             val decText: StringBuilder = entityDecode(comment)
 
-                            doc.createComment(parent, decText.toString())
+                            model.createComment(parent, decText.toString())
 
                             return TOKEN_COMMENT
                         }
@@ -98,7 +99,7 @@ class HtmlParser {
                                 val qName = group[1]
                                 val publicId = group[2]
                                 val systemId = group[3]
-                                val doctype = doc.createDocumentType(
+                                val doctype = model.createDocumentType(
                                     qName,
                                     publicId,
                                     systemId
@@ -124,7 +125,7 @@ class HtmlParser {
                     tag = tag.substring(1)
                     val data = readProcessingInstruction(source)
 
-                    doc.createProcessingInstruction(parent, tag, data.toString())
+                    model.createProcessingInstruction(parent, tag, data.toString())
 
                     return TOKEN_FULL_ELEMENT
                 } else {
@@ -132,7 +133,7 @@ class HtmlParser {
                     val tagHasPrefix = localIndex > 0
                     val localName: String =
                         (if (tagHasPrefix) normalTag.substring(localIndex + 1) else normalTag)
-                    var element = doc.createElement(localName)
+                    var element = model.createElement(localName)
 
                     try {
                         if (!this.justReadTagEnd) {
@@ -148,7 +149,7 @@ class HtmlParser {
                         }
                         // Add element to parent before children are added.
                         // This is necessary for incremental rendering.
-                        safeAppendChild(parent, element)
+                        safeAppendChild(model, parent, element)
                         if (!this.justReadEmptyElement) {
                             var einfo: ElementInfo? =
                                 ELEMENT_INFOS[localName.uppercase()]
@@ -272,7 +273,7 @@ class HtmlParser {
                                             // newElement should have been suspended.
                                             element = newElement
                                             // Add to parent
-                                            safeAppendChild(parent, element)
+                                            safeAppendChild(model, parent, element)
                                             if (this.justReadEmptyElement) {
                                                 return TOKEN_BEGIN_ELEMENT
                                             }
