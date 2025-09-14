@@ -26,7 +26,7 @@ class ModelTest {
         println(model.content())
 
 
-        var children = model.getChildren(hello, text.name)
+        var children = model.getChildren(hello, TEXT_NODE)
         assertEquals(children.size, 1)
 
         children = model.getChildren(hello, "nope")

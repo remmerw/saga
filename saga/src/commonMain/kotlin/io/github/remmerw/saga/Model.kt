@@ -12,6 +12,7 @@ class Model() : Node(0, "#model") {
     @OptIn(ExperimentalAtomicApi::class)
     private val uids = AtomicLong(0L)
     private val nodes: MutableMap<Long, Node> = mutableMapOf()
+    private val style = Style()
 
 
     init {
@@ -34,13 +35,13 @@ class Model() : Node(0, "#model") {
     }
 
     internal fun html(): Entity? {
-        return getChildren().firstOrNull { entity -> entity.name.lowercase() == "html" }
+        return getChildren().firstOrNull { entity -> entity.name == Tag.HTML.tag() }
     }
 
     internal fun body(): Entity? {
         val html = html()
         if (html != null) {
-            return getChildren(html).firstOrNull { entity -> entity.name.lowercase() == "body" }
+            return getChildren(html).firstOrNull { entity -> entity.name == Tag.BODY.tag() }
         }
         return null
     }
@@ -48,7 +49,7 @@ class Model() : Node(0, "#model") {
     internal fun head(): Entity? {
         val html = html()
         if (html != null) {
-            return getChildren(html).firstOrNull { entity -> entity.name.lowercase() == "head" }
+            return getChildren(html).firstOrNull { entity -> entity.name == Tag.HEAD.tag() }
         }
         return null
     }
@@ -56,7 +57,7 @@ class Model() : Node(0, "#model") {
     internal fun styles(): List<Entity> {
         val html = head()
         if (html != null) {
-            return getChildren(html).filter { entity -> entity.name.lowercase() == "style" }
+            return getChildren(html).filter { entity -> entity.name == Tag.STYLE.tag() }
         }
         return emptyList()
     }
@@ -64,7 +65,7 @@ class Model() : Node(0, "#model") {
     internal fun links(): List<Entity> {
         val html = head()
         if (html != null) {
-            return getChildren(html).filter { entity -> entity.name.lowercase() == "link" }
+            return getChildren(html).filter { entity -> entity.name == Tag.LINK.tag() }
         }
         return emptyList()
     }
@@ -72,17 +73,20 @@ class Model() : Node(0, "#model") {
 
     internal fun createElement(name: String): Element {
         val uid = this.nextUid()
-        val element = Element(uid, name)
+        val element = Element(uid, name.lowercase())
         addNode(element)
         return element
     }
 
 
-    internal fun createText(parent: Node, data: String): Text {
-        val text = Text(nextUid(), data)
-        addNode(text)
-        parent.appendChild(text)
-        return text
+    internal fun createText(parent: Node, data: String) {
+        if (parent.name == Tag.STYLE.tag()) {
+            style.parseStyle(data)
+        } else {
+            val text = Text(nextUid(), data)
+            addNode(text)
+            parent.appendChild(text)
+        }
     }
 
     internal fun createComment(parent: Node, data: String): Comment {
@@ -155,10 +159,9 @@ class Model() : Node(0, "#model") {
         return child.entity()
     }
 
-    fun createText(parent: Entity, text: String): Entity {
+    fun createText(parent: Entity, text: String) {
         val parent = nodes[parent.uid]!!
-        val child = createText(parent, text)
-        return child.entity()
+        createText(parent, text)
     }
 
     fun removeEntity(parent: Entity = entity(), entity: Entity) {
@@ -195,15 +198,20 @@ class Model() : Node(0, "#model") {
     }
 
     fun normalize() {
-        attachStylesheets(this)
+        val body = body()
+        if (body != null) {
+            style.handleNode(this, body)
+        } else {
+            debug("Document does not contains a body")
+        }
     }
 
     internal fun nodes(name: String): List<Node> {
-        return nodes.values.filter { node -> name.lowercase() == node.name.lowercase() } // todo lowercase
+        return nodes.values.filter { node -> name == node.name }
     }
 
     internal fun content(builder: StringBuilder, node: Node, spaces: Int) {
-        val name = node.name.lowercase()
+        val name = node.name
 
         val space = if (spaces > 0) "  ".repeat(spaces) else ""
         if (node is Element) {
@@ -227,7 +235,7 @@ class Model() : Node(0, "#model") {
             }
         } else if (node is Text) {
             require(node.getChildren().isEmpty()) { "Text has no children" }
-            builder.appendLine("$space<$name>" + node.getData() + "</$name>")
+            builder.appendLine(space + node.getData())
         } else {
             if (node.getChildren().isEmpty()) {
                 builder.appendLine("$space<$name/>")
