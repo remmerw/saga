@@ -104,7 +104,7 @@ class HtmlParser {
                                     publicId,
                                     systemId
                                 )
-                                isDocTypeXHTML = (doctype.qualifiedName == "html")
+                                isDocTypeXHTML = (doctype.qualifiedName == Tag.HTML.tag())
                                         && (doctype.publicId == XHTML_STRICT_PUBLIC_ID)
                                         && (doctype.systemId == XHTML_STRICT_SYS_ID)
                             }
@@ -1143,6 +1143,83 @@ class HtmlParser {
             // diacrit symb
             entities.put("circ", (710.toChar()))
             entities.put("tilde", (732.toChar()))
+
+
+            val elementInfos: MutableMap<String, ElementInfo> = ELEMENT_INFOS
+
+            elementInfos.put(
+                Tag.NOSCRIPT.name,
+                ElementInfo(true, ElementInfo.Companion.END_ELEMENT_REQUIRED, null, true)
+            )
+
+            val optionalEndElement = ElementInfo(true, ElementInfo.Companion.END_ELEMENT_OPTIONAL)
+            val forbiddenEndElement =
+                ElementInfo(false, ElementInfo.Companion.END_ELEMENT_FORBIDDEN)
+            val onlyTextDE = ElementInfo(false, ElementInfo.Companion.END_ELEMENT_REQUIRED, true)
+            val onlyText = ElementInfo(false, ElementInfo.Companion.END_ELEMENT_REQUIRED, false)
+
+            val tableCellStopElements: MutableSet<String> = HashSet() // todo optimize
+            tableCellStopElements.add(Tag.TH.name)
+            tableCellStopElements.add(Tag.TD.name)
+            tableCellStopElements.add(Tag.TR.name)
+            val tableCellElement =
+                ElementInfo(true, ElementInfo.Companion.END_ELEMENT_OPTIONAL, tableCellStopElements)
+
+            val headStopElements: MutableSet<String> = HashSet()
+            headStopElements.add(Tag.BODY.name)
+            headStopElements.add(Tag.DIV.name)
+            headStopElements.add(Tag.SPAN.name)
+            headStopElements.add(Tag.TABLE.name)
+            val headElement =
+                ElementInfo(true, ElementInfo.Companion.END_ELEMENT_OPTIONAL, headStopElements)
+
+            val optionStopElements: MutableSet<String> = HashSet()
+            optionStopElements.add(Tag.OPTION.name)
+            optionStopElements.add(Tag.SELECT.name)
+            val optionElement =
+                ElementInfo(true, ElementInfo.Companion.END_ELEMENT_OPTIONAL, optionStopElements)
+
+            val paragraphStopElements: MutableSet<String> = HashSet()
+            paragraphStopElements.add(Tag.P.name)
+            paragraphStopElements.add(Tag.DIV.name)
+            paragraphStopElements.add(Tag.TABLE.name)
+            paragraphStopElements.add(Tag.PRE.name)
+            paragraphStopElements.add(Tag.UL.name)
+            paragraphStopElements.add(Tag.OL.name)
+            val paragraphElement =
+                ElementInfo(true, ElementInfo.Companion.END_ELEMENT_OPTIONAL, paragraphStopElements)
+
+
+            elementInfos.put(Tag.SCRIPT.name, onlyText)
+            elementInfos.put(Tag.STYLE.name, onlyText)
+            elementInfos.put(Tag.TEXTAREA.name, onlyTextDE)
+            elementInfos.put(Tag.IMG.name, forbiddenEndElement)
+            elementInfos.put(Tag.META.name, forbiddenEndElement)
+            elementInfos.put(Tag.LINK.name, forbiddenEndElement)
+            elementInfos.put(Tag.BASE.name, forbiddenEndElement)
+            elementInfos.put(Tag.INPUT.name, forbiddenEndElement)
+            elementInfos.put(Tag.FRAME.name, forbiddenEndElement)
+            elementInfos.put(Tag.BR.name, forbiddenEndElement)
+            elementInfos.put(Tag.HR.name, forbiddenEndElement)
+            elementInfos.put(Tag.EMBED.name, forbiddenEndElement)
+            elementInfos.put(Tag.SPACER.name, forbiddenEndElement)
+
+            elementInfos.put(Tag.P.name, paragraphElement)
+            elementInfos.put(Tag.LI.name, optionalEndElement)
+            elementInfos.put(Tag.DT.name, optionalEndElement)
+            elementInfos.put(Tag.DD.name, optionalEndElement)
+            elementInfos.put(Tag.TR.name, optionalEndElement)
+            elementInfos.put(Tag.TH.name, tableCellElement)
+            elementInfos.put(Tag.TD.name, tableCellElement)
+            elementInfos.put(Tag.HEAD.name, headElement)
+            elementInfos.put(Tag.OPTION.name, optionElement)
+
+            // Note: The specification states anchors have
+            // a required end element, but browsers generally behave
+            // as if it's optional.
+            elementInfos.put(Tag.A.name, optionalEndElement)
+            elementInfos.put(Tag.ANCHOR.name, optionalEndElement)
+            // TODO: Keep adding tags here
         }
 
 
