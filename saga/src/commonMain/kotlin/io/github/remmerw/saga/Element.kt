@@ -46,4 +46,17 @@ internal class Element(uid: Long, name: String) : Node(uid, name) {
         }
     }
 
+    internal fun changeAttributes(removed: List<String>, attrs: Map<String, String>) {
+        _attributes.update {
+            val map = _attributes.value.toMutableMap()
+            removed.forEach { key ->
+                map.remove(key)
+            }
+            attrs.forEach { (key, value) ->
+                map.put(key.lowercase(), value)
+            }
+            map
+        }
+    }
+
 }

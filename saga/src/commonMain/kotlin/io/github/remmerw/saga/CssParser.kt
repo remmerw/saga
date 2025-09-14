@@ -3,6 +3,8 @@ package io.github.remmerw.saga
 import kotlin.jvm.JvmInline
 
 
+internal val NOT_NORMALIZE = listOf("svg")
+
 internal fun parseClassDeclarations(element: String, declarations: String): List<String> {
     val result = mutableListOf<String>()
 
@@ -164,7 +166,6 @@ internal data class CSSRuleSet(
 
 
 internal enum class StyleOrigin(val value: Int) {
-    EXTERNAL(0),
     INTERNAL(1),
     INLINE(2)
 }
@@ -191,15 +192,18 @@ fun attachStylesheets(model: Model) {
 private fun handleNode(model: Model, entity: Entity, cssMap: Map<String, List<CSSRuleSet>>) {
     val node = model.node(entity)
     if (node is Element) {
-        val cssDeclarations = buildFinalCSS(node, cssMap)
-        val properties = mutableMapOf<String, String>()
-        cssDeclarations.forEach { declaration ->
-            properties.put(declaration.property, declaration.value)
-        }
-        node.addAttributes(properties)
+        if (!NOT_NORMALIZE.contains(node.name.lowercase())) {
+            val cssDeclarations = buildFinalCSS(node, cssMap)
+            val properties = mutableMapOf<String, String>()
+            cssDeclarations.forEach { declaration ->
+                properties.put(declaration.property, declaration.value)
+            }
+            // remove class and style attribute
+            node.changeAttributes(listOf("class", "style"), properties)
 
-        node.getChildren().forEach { entity ->
-            handleNode(model, entity, cssMap)
+            node.getChildren().forEach { entity ->
+                handleNode(model, entity, cssMap)
+            }
         }
     }
 }
