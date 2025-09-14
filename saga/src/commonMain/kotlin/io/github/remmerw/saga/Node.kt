@@ -13,13 +13,13 @@ abstract class Node(
     val children = _children.asStateFlow()
 
     fun getChildren(): List<Entity> {
-        return children.value.toList()
+        return _children.value.toList()
     }
 
 
     internal fun appendChild(child: Node) {
         this._children.update {
-            val list = this.children.value.toMutableList()
+            val list = this._children.value.toMutableList()
             list.add(child.entity())
             list
         }
@@ -27,7 +27,7 @@ abstract class Node(
 
     internal fun removeChild(child: Node) {
         this._children.update {
-            val list = this.children.value.toMutableList()
+            val list = this._children.value.toMutableList()
             list.remove(child.entity())
             list
         }

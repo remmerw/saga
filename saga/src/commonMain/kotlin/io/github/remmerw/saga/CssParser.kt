@@ -1,12 +1,20 @@
 package io.github.remmerw.saga
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.async
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withContext
 import kotlin.jvm.JvmInline
 
+
+internal fun parseClassDeclarations(element: String, declarations: String): List<String> {
+    val result = mutableListOf<String>()
+
+    declarations.split(" ").forEach { text ->
+        val selector = text.trim()
+        if (selector.isNotBlank()) {
+            result.add(".$selector")
+            result.add("$element.$selector")
+        }
+    }
+    return result
+}
 
 internal fun parseCssDeclarations(declarations: String): List<CSSDeclarationWithImportant> =
     buildList {
@@ -162,30 +170,16 @@ internal enum class StyleOrigin(val value: Int) {
 }
 
 
-suspend fun attachStylesheets(
-    model: Model,
-    getExternalCSS: (suspend (link: String) -> String)?
-): Unit = withContext(Dispatchers.IO) {
+fun attachStylesheets(model: Model) {
     val body = model.body()
 
-    val externalCssJob = async {
-        getExternalCSS?.let { get ->
-            buildExternalCSSBlock(model, get)
-        }
-    }
     val internalCSS = buildInternalCSSBlock(model)
-    val externalCss = externalCssJob.await()
 
     val map = mutableMapOf<String, MutableList<CSSRuleSet>>()
 
     internalCSS.forEach { rule ->
         map.getOrPut(rule.selector) { mutableListOf() }.add(rule)
     }
-    externalCss?.forEach { rule ->
-        map.getOrPut(rule.selector) { mutableListOf() }.add(rule)
-    }
-    ensureActive()
-
 
     if (body != null) {
         handleNode(model, body, map)
@@ -199,42 +193,15 @@ private fun handleNode(model: Model, entity: Entity, cssMap: Map<String, List<CS
     if (node is Element) {
         val cssDeclarations = buildFinalCSS(node, cssMap)
         val properties = mutableMapOf<String, String>()
-        cssDeclarations?.forEach { declaration ->
+        cssDeclarations.forEach { declaration ->
             properties.put(declaration.property, declaration.value)
         }
-        node.addProperties(properties)
+        node.addAttributes(properties)
 
         node.getChildren().forEach { entity ->
             handleNode(model, entity, cssMap)
         }
     }
-}
-
-private suspend fun buildExternalCSSBlock(
-    model: Model,
-    getExternalCSS: (suspend (link: String) -> String)
-): List<CSSRuleSet> = withContext(Dispatchers.Default) {
-
-    val links = model.links()
-    val result: MutableList<CSSRuleSet> = mutableListOf()
-
-    links.forEach { entity ->
-        val link = (model.node(entity) as Element)
-        val rel = link.getAttribute("rel")
-        val href = link.getAttribute("href")
-        if (rel != null && href != null && rel == "stylesheet") {
-            try {
-                result.addAll(
-                    parseCssRuleBlock(
-                        StyleOrigin.EXTERNAL, getExternalCSS(href)
-                    )
-                )
-            } catch (throwable: Throwable) {
-                debug(throwable)
-            }
-        }
-    }
-    result
 }
 
 
@@ -262,15 +229,27 @@ private fun buildInternalCSSBlock(model: Model): List<CSSRuleSet> {
 private fun buildFinalCSS(
     element: Element,
     cssMap: Map<String, List<CSSRuleSet>>
-): List<CSSDeclaration>? {
+): List<CSSDeclaration> {
 
-    val noInlineCSS = cssMap[element.name.lowercase()]
-    val inlineCSS = element.getAttribute("style")?.ifBlank { null }?.let(::parseCssDeclarations)
+    val name = element.name.lowercase()
 
-    if (inlineCSS == null && noInlineCSS == null) {
-        return null
-    } else if (inlineCSS != null && noInlineCSS == null) {
-        return inlineCSS
+    val inlineCss: MutableList<CSSDeclarationWithImportant> = mutableListOf()
+    val styleAttribute = element.getAttribute("style")
+    if (styleAttribute != null && styleAttribute.isNotBlank()) {
+        val declarations = parseCssDeclarations(styleAttribute)
+        inlineCss.addAll(declarations)
+    }
+
+    val noInlineCSS = mutableListOf<CSSRuleSet>()
+
+    cssMap[name]?.let { ruleSets -> noInlineCSS.addAll(ruleSets) }
+
+    val classAttribute = element.getAttribute("class")
+    if (classAttribute != null && classAttribute.isNotBlank()) {
+        val selectors = parseClassDeclarations(name, classAttribute)
+        selectors.forEach { name ->
+            cssMap[name]?.let { ruleSets -> noInlineCSS.addAll(ruleSets) }
+        }
     }
 
     val finalCssMap = mutableMapOf<String, CSSDeclarationWithPriority>()
@@ -282,10 +261,10 @@ private fun buildFinalCSS(
         }
     }
 
-    inlineCSS?.forEach { declaration ->
+    inlineCss.forEach { declaration ->
         CSSDeclarationWithPriority(declaration, StyleOrigin.INLINE).compareAndPutMap()
     }
-    noInlineCSS?.mapIndexed { index, ruleSet ->
+    noInlineCSS.mapIndexed { index, ruleSet ->
         ruleSet.declarations.forEach { declaration ->
             CSSDeclarationWithPriority(
                 declaration,

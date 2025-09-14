@@ -175,10 +175,6 @@ class Model() : Node(0, "#model") {
         return (nodes[entity.uid] as Element).attributes
     }
 
-    fun properties(entity: Entity): StateFlow<Map<String, String>> {
-        return (nodes[entity.uid] as Element).properties
-    }
-
     fun text(entity: Entity): StateFlow<String> {
         return (nodes[entity.uid] as Text).data
     }
@@ -198,8 +194,8 @@ class Model() : Node(0, "#model") {
         return content(entity())
     }
 
-    suspend fun attachStylesheets(externalCSS: (suspend (link: String) -> String)? = null) {
-        attachStylesheets(this, externalCSS)
+    fun normalize() {
+        attachStylesheets(this)
     }
 
     internal fun nodes(name: String): List<Node> {
@@ -252,4 +248,5 @@ class Model() : Node(0, "#model") {
         }
         return result.toString()
     }
+
 }
