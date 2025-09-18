@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             ...
-            implementation("io.github.remmerw:saga:0.1.4") 
+            implementation("io.github.remmerw:saga:0.1.5") 
         }
         ...
     }
