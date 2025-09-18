@@ -154,10 +154,9 @@ class Parser {
                         }
                         if (!this.justReadEmptyElement) {
                             var einfo: ElementInfo? = null
-                            var endTagType =
-                                einfo?.endElementType ?: END_ELEMENT_REQUIRED
+                            var endTagType =END_ELEMENT_REQUIRED
                             if (endTagType != END_ELEMENT_FORBIDDEN) {
-                                var childrenOk = einfo == null || einfo.childElementOk
+                                var childrenOk = true
                                 var newStopSet = einfo?.stopTags
                                 if (newStopSet == null) {
                                     if (endTagType == END_ELEMENT_OPTIONAL) {
@@ -251,15 +250,11 @@ class Parser {
                                                 throw se
                                             }
                                             einfo = null
-                                            endTagType =
-                                                einfo?.endElementType
-                                                    ?: END_ELEMENT_REQUIRED
-                                            childrenOk = einfo == null || einfo.childElementOk
-                                            newStopSet = einfo?.stopTags
-                                            if (newStopSet == null) {
-                                                if (endTagType == END_ELEMENT_OPTIONAL) {
-                                                    newStopSet = mutableSetOf(normalTag)
-                                                }
+                                            endTagType = END_ELEMENT_REQUIRED
+                                            childrenOk = true
+                                            newStopSet = null
+                                            if (endTagType == END_ELEMENT_OPTIONAL) {
+                                                newStopSet = mutableSetOf(normalTag)
                                             }
                                             if ((stopTags != null) && (newStopSet != null)) {
                                                 val newStopSet2: MutableSet<String> = HashSet()
