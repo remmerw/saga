@@ -9,26 +9,13 @@ internal const val END_ELEMENT_FORBIDDEN: Int = 0
 internal const val END_ELEMENT_OPTIONAL: Int = 1
 internal const val END_ELEMENT_REQUIRED: Int = 2
 
-class Parser {
-    private val model: Model
+class Parser(val model: Model) {
 
     private var normalLastTag: String? = null
     private var justReadTagBegin = false
     private var justReadTagEnd = false
-    private val isScriptingEnabled = false
     private var rootDetected = false
-
-    /**
-     * Only set when readAttribute returns false.
-     */
     private var justReadEmptyElement = false
-
-
-    constructor(model: Model) {
-        this.model = model
-
-    }
-
 
     fun purify(text: String): String {
         if (text.startsWith("\n")) {
@@ -43,6 +30,7 @@ class Parser {
 
 
     fun parse(source: Source, parent: Node) {
+        @Suppress("ControlFlowWithEmptyBody")
         while (this.parseToken(
                 parent, source, null,
                 ArrayDeque()
@@ -110,12 +98,10 @@ class Parser {
                         }
                     }
                 } else if (tag.startsWith("/")) {
-                    tag = tag.substring(1)
                     normalTag = normalTag!!.substring(1)
                     this.passEndOfTag(source)
                     return TOKEN_END_ELEMENT
                 } else if (tag.startsWith("?")) {
-                    tag = tag.substring(1)
                     val data = readProcessingInstruction(source)
                     debug("processing instruction $data")
 

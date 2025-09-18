@@ -27,7 +27,7 @@ value class Value(val data: String) {
     }
 }
 
-fun String.onlyLowerLetters(): Boolean =
+internal fun String.onlyLowerLetters(): Boolean =
     (firstOrNull { !it.isLetter() || !it.isLowerCase() } == null)
 
 fun String.toTag(): Tag = Tag(this)
@@ -37,5 +37,5 @@ fun String.toKey(): Key = Key(this)
 fun String.toValue(): Value = Value(this)
 
 
-fun String.hasLineSeparator(): Boolean =
+internal fun String.hasLineSeparator(): Boolean =
     (firstOrNull { it == '\n' } == null)
