@@ -153,15 +153,13 @@ class Parser {
                             parent.appendChild(element)
                         }
                         if (!this.justReadEmptyElement) {
-                            var einfo: ElementInfo? = null
-                            var endTagType =END_ELEMENT_REQUIRED
+
+                            var endTagType = END_ELEMENT_REQUIRED
                             if (endTagType != END_ELEMENT_FORBIDDEN) {
                                 var childrenOk = true
-                                var newStopSet = einfo?.stopTags
-                                if (newStopSet == null) {
-                                    if (endTagType == END_ELEMENT_OPTIONAL) {
-                                        newStopSet = mutableSetOf(normalTag)
-                                    }
+                                var newStopSet: MutableSet<String>? = null
+                                if (endTagType == END_ELEMENT_OPTIONAL) {
+                                    newStopSet = mutableSetOf(normalTag)
                                 }
                                 if (stopTags != null) {
                                     if (newStopSet != null) {
@@ -178,37 +176,17 @@ class Parser {
                                 try {
                                     while (true) {
                                         try {
-                                            val token: Int
-                                            if ((einfo != null) && einfo.noScriptElement) {
 
-                                                if (isScriptingEnabled) {
-                                                    token = this.parseForEndTag(
-                                                        parent,
-                                                        source,
-                                                        tag,
-                                                        false,
-                                                        true
-                                                    )
-                                                } else {
-                                                    token = this.parseToken(
-                                                        element,
-                                                        source,
-                                                        newStopSet,
-                                                        ancestors
-                                                    )
-                                                }
-                                            } else {
-                                                token = if (childrenOk) this.parseToken(
-                                                    element,
-                                                    source,
-                                                    newStopSet,
-                                                    ancestors
-                                                ) else this.parseForEndTag(
-                                                    element, source,
-                                                    tag, true,
-                                                    true
-                                                )
-                                            }
+                                            val token: Int = if (childrenOk) this.parseToken(
+                                                element,
+                                                source,
+                                                newStopSet,
+                                                ancestors
+                                            ) else this.parseForEndTag(
+                                                element, source, tag
+
+                                            )
+
                                             if (token == TOKEN_END_ELEMENT) {
                                                 val normalLastTag = this.normalLastTag
                                                 if (normalTag.equals(
@@ -249,7 +227,7 @@ class Parser {
                                             if ((stopTags != null) && stopTags.contains(normalTag)) {
                                                 throw se
                                             }
-                                            einfo = null
+
                                             endTagType = END_ELEMENT_REQUIRED
                                             childrenOk = true
                                             newStopSet = null
@@ -323,9 +301,7 @@ class Parser {
     }
 
     private fun parseForEndTag(
-        parent: Node, reader: Source, tagName: String?,
-        addTextNode: Boolean,
-        decodeEntities: Boolean
+        parent: Node, reader: Source, tagName: String?
     ): Int {
         val doc = this.model
         var intCh: Int
@@ -347,15 +323,15 @@ class Parser {
                                     this.justReadTagEnd = true
                                     this.justReadEmptyElement = false
                                     this.normalLastTag = thisTag
-                                    if (addTextNode) {
-                                        if (decodeEntities) {
-                                            sb = entityDecode(sb)
-                                        }
-                                        val text = purify(sb.toString())
-                                        if (text.isNotEmpty()) {
-                                            doc.setData(parent, text)
-                                        }
+
+
+                                    sb = entityDecode(sb)
+
+                                    val text = purify(sb.toString())
+                                    if (text.isNotEmpty()) {
+                                        doc.setData(parent, text)
                                     }
+
                                     return TOKEN_END_ELEMENT
                                 } else {
                                     break
@@ -390,15 +366,15 @@ class Parser {
         this.justReadTagBegin = false
         this.justReadTagEnd = false
         this.justReadEmptyElement = false
-        if (addTextNode) {
-            if (decodeEntities) {
-                sb = entityDecode(sb)
-            }
-            val text = purify(sb.toString())
-            if (text.isNotEmpty()) {
-                doc.setData(parent, text)
-            }
+
+
+        sb = entityDecode(sb)
+
+        val text = purify(sb.toString())
+        if (text.isNotEmpty()) {
+            doc.setData(parent, text)
         }
+
         return TOKEN_EOD
     }
 
@@ -690,7 +666,6 @@ class Parser {
             val ch = chInt.toChar()
             if (ch == '=') {
                 lastCharSlash = false
-                blankFound = false
                 break
             } else if (ch == '>') {
                 if ((attributeName != null) && (attributeName.isNotEmpty())) {
@@ -813,7 +788,6 @@ class Parser {
                 this.justReadEmptyElement = lastCharSlash
                 return false
             } else if ((openQuote == -1) && ch.isWhitespace()) {
-                lastCharSlash = false
                 if (attributeName != null) {
                     val attributeNameStr = attributeName.toString()
                     if (attributeValue == null) {

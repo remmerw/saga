@@ -16,11 +16,11 @@ class ModelTest {
     @Test
     fun parseTest() {
         val model = createModel("hello".toTag())
-        val a = model.createEntity("a".toTag(), mapOf( "a".toKey() to "b".toValue()))
+        val a = model.createEntity("a".toTag(), mapOf("a".toKey() to "b".toValue()))
         model.createEntity("text".toTag(), "hello \n moin")
 
         val child = model.createEntity("child".toTag(), a, mapOf())
-        model.createEntity("text".toTag(), child,"hello \n moin \t dddddd")
+        model.createEntity("text".toTag(), child, "hello \n moin \t dddddd")
 
         println(model.content())
         val buffer = Buffer()
@@ -32,8 +32,7 @@ class ModelTest {
 
 
     @Test
-    fun basicTest(){
-
+    fun basicTest() {
 
 
         val name = "hello".toTag()
@@ -46,26 +45,26 @@ class ModelTest {
         try {
             "hello2".toTag()
             fail()
-        } catch (_: IllegalArgumentException){
+        } catch (_: IllegalArgumentException) {
         }
 
         try {
-           "Hello".toTag()
+            "Hello".toTag()
             fail()
-        } catch (_: IllegalArgumentException){
+        } catch (_: IllegalArgumentException) {
         }
 
 
         try {
             "hello-abc".toTag()
-        } catch (_: IllegalArgumentException){
+        } catch (_: IllegalArgumentException) {
         }
 
 
         try {
             "hello\n2".toValue()
             fail()
-        } catch (_: IllegalArgumentException){
+        } catch (_: IllegalArgumentException) {
         }
 
     }
