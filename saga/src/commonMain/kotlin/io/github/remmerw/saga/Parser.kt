@@ -219,23 +219,21 @@ class Parser {
                                                 ) {
                                                     return TOKEN_FULL_ELEMENT
                                                 } else {
-                                                    val closeTagInfo: ElementInfo? =
-                                                        null
-                                                    if ((closeTagInfo == null) || (closeTagInfo.endElementType != END_ELEMENT_FORBIDDEN)) {
-                                                        // TODO: Rather inefficient algorithm, but it's
-                                                        // probably executed infrequently?
-                                                        val i = ancestors.iterator()
-                                                        if (i.hasNext()) {
-                                                            i.next()
-                                                            while (i.hasNext()) {
-                                                                val normalAncestorTag = i.next()
-                                                                if (normalLastTag == normalAncestorTag) {
-                                                                    normalTag = normalLastTag
-                                                                    return TOKEN_END_ELEMENT
-                                                                }
+
+                                                    // TODO: Rather inefficient algorithm, but it's
+                                                    // probably executed infrequently?
+                                                    val i = ancestors.iterator()
+                                                    if (i.hasNext()) {
+                                                        i.next()
+                                                        while (i.hasNext()) {
+                                                            val normalAncestorTag = i.next()
+                                                            if (normalLastTag == normalAncestorTag) {
+                                                                normalTag = normalLastTag
+                                                                return TOKEN_END_ELEMENT
                                                             }
                                                         }
                                                     }
+
                                                     // TODO: Working here
                                                 }
                                             } else if (token == TOKEN_EOD) {
