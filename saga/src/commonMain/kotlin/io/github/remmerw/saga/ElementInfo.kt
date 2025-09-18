@@ -15,9 +15,4 @@ internal class ElementInfo {
         this.decodeEntities = decodeEntities
     }
 
-    companion object {
-        const val END_ELEMENT_FORBIDDEN: Int = 0
-        const val END_ELEMENT_OPTIONAL: Int = 1
-        const val END_ELEMENT_REQUIRED: Int = 2
-    }
 }

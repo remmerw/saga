@@ -4,6 +4,11 @@ import kotlinx.io.Source
 import kotlinx.io.readCodePointValue
 
 internal class StopException(val element: Node) : Exception()
+
+internal const val END_ELEMENT_FORBIDDEN: Int = 0
+internal const val END_ELEMENT_OPTIONAL: Int = 1
+internal const val END_ELEMENT_REQUIRED: Int = 2
+
 class Parser {
     private val model: Model
 
@@ -23,7 +28,6 @@ class Parser {
         this.model = model
 
     }
-
 
 
     fun purify(text: String): String {
@@ -151,12 +155,12 @@ class Parser {
                         if (!this.justReadEmptyElement) {
                             var einfo: ElementInfo? = null
                             var endTagType =
-                                einfo?.endElementType ?: ElementInfo.Companion.END_ELEMENT_REQUIRED
-                            if (endTagType != ElementInfo.Companion.END_ELEMENT_FORBIDDEN) {
+                                einfo?.endElementType ?: END_ELEMENT_REQUIRED
+                            if (endTagType != END_ELEMENT_FORBIDDEN) {
                                 var childrenOk = einfo == null || einfo.childElementOk
                                 var newStopSet = einfo?.stopTags
                                 if (newStopSet == null) {
-                                    if (endTagType == ElementInfo.Companion.END_ELEMENT_OPTIONAL) {
+                                    if (endTagType == END_ELEMENT_OPTIONAL) {
                                         newStopSet = mutableSetOf(normalTag)
                                     }
                                 }
@@ -168,7 +172,7 @@ class Parser {
                                         newStopSet = newStopSet2
                                     } else {
                                         newStopSet =
-                                            if (endTagType == ElementInfo.Companion.END_ELEMENT_REQUIRED) null else stopTags
+                                            if (endTagType == END_ELEMENT_REQUIRED) null else stopTags
                                     }
                                 }
                                 ancestors.addFirst(normalTag)
@@ -217,7 +221,7 @@ class Parser {
                                                 } else {
                                                     val closeTagInfo: ElementInfo? =
                                                         null
-                                                    if ((closeTagInfo == null) || (closeTagInfo.endElementType != ElementInfo.Companion.END_ELEMENT_FORBIDDEN)) {
+                                                    if ((closeTagInfo == null) || (closeTagInfo.endElementType != END_ELEMENT_FORBIDDEN)) {
                                                         // TODO: Rather inefficient algorithm, but it's
                                                         // probably executed infrequently?
                                                         val i = ancestors.iterator()
@@ -251,11 +255,11 @@ class Parser {
                                             einfo = null
                                             endTagType =
                                                 einfo?.endElementType
-                                                    ?: ElementInfo.Companion.END_ELEMENT_REQUIRED
+                                                    ?: END_ELEMENT_REQUIRED
                                             childrenOk = einfo == null || einfo.childElementOk
                                             newStopSet = einfo?.stopTags
                                             if (newStopSet == null) {
-                                                if (endTagType == ElementInfo.Companion.END_ELEMENT_OPTIONAL) {
+                                                if (endTagType == END_ELEMENT_OPTIONAL) {
                                                     newStopSet = mutableSetOf(normalTag)
                                                 }
                                             }
