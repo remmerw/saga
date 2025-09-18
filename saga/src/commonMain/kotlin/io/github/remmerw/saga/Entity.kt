@@ -38,6 +38,10 @@ value class Value(private val data: String) {
         return data
     }
 
+    fun toFloat(): Float {
+        return data.toFloat()
+    }
+
     fun toLong(): Long {
         return data.toLong()
     }
@@ -56,6 +60,11 @@ fun String.toKey(): Key = Key(this)
 
 fun String.toValue(): Value = Value(this)
 
+fun Long.toValue(): Value = Value(this.toString())
+
+fun Int.toValue(): Value = Value(this.toString())
+
+fun Float.toValue(): Value = Value(this.toString())
 
 internal fun String.hasLineSeparator(): Boolean =
     (firstOrNull { it == '\n' } == null)
