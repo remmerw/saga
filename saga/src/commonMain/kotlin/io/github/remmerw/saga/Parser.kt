@@ -6,7 +6,7 @@ import kotlinx.io.readCodePointValue
 internal class StopException(val element: Node) : Exception()
 class Parser {
     private val model: Model
-    private val isXML: Boolean
+
     private var normalLastTag: String? = null
     private var justReadTagBegin = false
     private var justReadTagEnd = false
@@ -19,17 +19,12 @@ class Parser {
     private var justReadEmptyElement = false
 
 
-    constructor(
-        model: Model,
-        isXML: Boolean
-    ) {
+    constructor(model: Model) {
         this.model = model
-        this.isXML = isXML
+
     }
 
-    private fun shouldDecodeEntities(info: ElementInfo?): Boolean {
-        return isXML || (info == null || info.decodeEntities)
-    }
+
 
     fun purify(text: String): String {
         if (text.startsWith("\n")) {
@@ -189,7 +184,7 @@ class Parser {
                                                         source,
                                                         tag,
                                                         false,
-                                                        shouldDecodeEntities(einfo)
+                                                        true
                                                     )
                                                 } else {
                                                     token = this.parseToken(
@@ -207,7 +202,8 @@ class Parser {
                                                     ancestors
                                                 ) else this.parseForEndTag(
                                                     element, source,
-                                                    tag, true, shouldDecodeEntities(einfo)
+                                                    tag, true,
+                                                    true
                                                 )
                                             }
                                             if (token == TOKEN_END_ELEMENT) {

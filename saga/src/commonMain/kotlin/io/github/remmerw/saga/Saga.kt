@@ -9,7 +9,7 @@ fun createModel(tag: Tag): Model {
 
 fun createModel(tag: Tag, source: Source): Model {
     val model = createModel(tag)
-    val parser = Parser(model = model, isXML = false)
+    val parser = Parser(model)
     parser.parse(source)
     return model
 }
