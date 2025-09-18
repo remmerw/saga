@@ -158,7 +158,7 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
     }
 
     internal fun content(builder: StringBuilder, node: Node, spaces: Int) {
-        val name = node.entity.tag.name
+        val name = node.entity.tag.toString()
 
         val space = if (spaces > 0) "  ".repeat(spaces) else ""
 
@@ -197,7 +197,7 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
     internal fun attributes(node: Node): String {
         val result = StringBuilder()
         node.attributes().forEach { (key, value) ->
-            result.append(" ${key.name}=\"${value.data}\"")
+            result.append(" ${key}=\"${value}\"")
         }
         return result.toString()
     }

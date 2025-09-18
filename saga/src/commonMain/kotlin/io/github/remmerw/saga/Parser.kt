@@ -205,7 +205,7 @@ class Parser(val model: Model) {
                                         } catch (se: StopException) {
                                             // newElement does not have a parent.
                                             val newElement = se.element
-                                            tag = newElement.entity.tag.name
+                                            tag = newElement.entity.tag.toString()
                                             normalTag = tag
                                             // If a subelement throws StopException with
                                             // a tag matching the current stop tag, the exception
