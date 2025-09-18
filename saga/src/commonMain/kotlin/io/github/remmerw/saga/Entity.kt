@@ -34,6 +34,10 @@ value class Value(private val data: String) {
         require(data.hasLineSeparator()) { "no line separators allowed" }
     }
 
+    fun toData() : ByteArray{
+        return data.encodeToByteArray()
+    }
+
     override fun toString(): String {
         return data
     }
@@ -48,6 +52,10 @@ value class Value(private val data: String) {
 
     fun toInt(): Int {
         return data.toInt()
+    }
+
+    fun toBoolean(): Boolean {
+        return data.toBoolean()
     }
 }
 
@@ -65,6 +73,8 @@ fun Long.toValue(): Value = Value(this.toString())
 fun Int.toValue(): Value = Value(this.toString())
 
 fun Float.toValue(): Value = Value(this.toString())
+
+fun Boolean.toValue(): Value = Value(this.toString())
 
 internal fun String.hasLineSeparator(): Boolean =
     (firstOrNull { it == '\n' } == null)

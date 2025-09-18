@@ -16,7 +16,13 @@ class ModelTest {
     @Test
     fun parseTest() {
         val model = createModel("hello".toTag())
-        val a = model.createEntity("a".toTag(), mapOf("a".toKey() to 3F.toValue()))
+        val a = model.createEntity("a".toTag(), mapOf(
+            "a".toKey() to 3F.toValue(),
+            "b".toKey() to true.toValue(),
+            "c".toKey() to 1L.toValue(),
+            "d".toKey() to 5.toValue(),
+            "e".toKey() to normalizeValue("hello \n zeit")))
+
         model.createEntity("text".toTag(), "hello \n moin")
 
         val child = model.createEntity("child".toTag(), a, mapOf())
