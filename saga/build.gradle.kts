@@ -1,4 +1,8 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
@@ -10,7 +14,7 @@ plugins {
 }
 
 group = "io.github.remmerw"
-version = "0.1.4"
+version = "0.1.5"
 
 
 kotlin {
@@ -28,12 +32,13 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    //linuxArm64()
-    //linuxX64()
-    //linuxArm64()
-    //wasmJs()
-    //wasmWasi()
-    //js()
+    linuxArm64()
+    linuxX64()
+    linuxArm64()
+
+    wasmWasi {
+        nodejs()
+    }
 
 
     sourceSets {
@@ -48,6 +53,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
             }
         }
     }

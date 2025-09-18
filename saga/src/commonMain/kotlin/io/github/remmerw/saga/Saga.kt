@@ -1,12 +1,17 @@
 package io.github.remmerw.saga
 
-
-const val XHTML_STRICT_PUBLIC_ID = "-//W3C//DTD XHTML 1.0 Strict//EN"
-const val XHTML_STRICT_SYS_ID = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+import kotlinx.io.Source
 
 
-fun createModel(): Model {
-    return Model()
+fun createModel(tag: Tag): Model {
+    return Model(tag)
+}
+
+fun createModel(tag: Tag, source: Source): Model {
+    val model = createModel(tag)
+    val parser = Parser(model = model, isXML = false)
+    parser.parse(source)
+    return model
 }
 
 

@@ -7,38 +7,6 @@ internal class ElementInfo {
     val noScriptElement: Boolean
     val decodeEntities: Boolean
 
-    /**
-     * @param ok
-     * @param type
-     */
-    constructor(ok: Boolean, type: Int) {
-        this.childElementOk = ok
-        this.endElementType = type
-        this.stopTags = null
-        this.noScriptElement = false
-        this.decodeEntities = true
-    }
-
-    /**
-     * @param ok
-     * @param type
-     */
-    constructor(ok: Boolean, type: Int, stopTags: MutableSet<String>?) {
-        this.childElementOk = ok
-        this.endElementType = type
-        this.stopTags = stopTags
-        this.noScriptElement = false
-        this.decodeEntities = true
-    }
-
-    constructor(ok: Boolean, type: Int, stopTags: MutableSet<String>?, noScriptElement: Boolean) {
-        this.childElementOk = ok
-        this.endElementType = type
-        this.stopTags = stopTags
-        this.noScriptElement = noScriptElement
-        this.decodeEntities = true
-    }
-
     constructor(ok: Boolean, type: Int, decodeEntities: Boolean) {
         this.childElementOk = ok
         this.endElementType = type
