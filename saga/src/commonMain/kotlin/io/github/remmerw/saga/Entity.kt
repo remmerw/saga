@@ -23,7 +23,7 @@ value class Key(val name: String) {
 @JvmInline
 value class Value(val data: String) {
     init {
-        require(data.hasWhitespaces()) { "no whitespaces allowed" }
+        require(data.hasLineSeparator()) { "no line separators allowed" }
     }
 }
 
@@ -37,5 +37,5 @@ fun String.toKey(): Key = Key(this)
 fun String.toValue(): Value = Value(this)
 
 
-fun String.hasWhitespaces(): Boolean =
-    (firstOrNull { it.isWhitespace() } == null)
+fun String.hasLineSeparator(): Boolean =
+    (firstOrNull { it == '\n' } == null)
