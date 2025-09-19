@@ -35,7 +35,7 @@ value class Value(private val data: String) {
     }
 
     fun toData(): ByteArray {
-        return data.encodeToByteArray()
+        return data.hexToByteArray()
     }
 
     override fun toString(): String {
@@ -75,6 +75,8 @@ fun Int.toValue(): Value = Value(this.toString())
 fun Float.toValue(): Value = Value(this.toString())
 
 fun Boolean.toValue(): Value = Value(this.toString())
+
+fun ByteArray.toValue(): Value = Value(this.toHexString())
 
 internal fun String.hasLineSeparator(): Boolean =
     (firstOrNull { it == '\n' } == null)

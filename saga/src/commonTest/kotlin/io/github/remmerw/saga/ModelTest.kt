@@ -5,7 +5,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.Buffer
+import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -38,6 +40,27 @@ class ModelTest {
         assertEquals(model.content(), cmp.content())
     }
 
+    @Test
+    fun parseTestBytes() {
+        val model = createModel("hello".toTag())
+
+        val bytes = Random.nextBytes(20)
+        model.createEntity("a".toTag(), mapOf(
+            "a".toKey() to bytes.toValue()))
+
+
+        println(model.content())
+        val buffer = Buffer()
+        model.content(buffer)
+        val cmp = createModel("hello".toTag(), buffer)
+        println(cmp.content())
+        val a = cmp.getChildren().first()
+        assertEquals(a.tag, "a".toTag())
+        val cmpBytes = cmp.getAttribute(a, "a".toKey())!!.toData()
+        assertContentEquals(bytes, cmpBytes)
+
+        assertEquals(model.content(), cmp.content())
+    }
 
     @Test
     fun basicTest() {

@@ -1,7 +1,10 @@
 package io.github.remmerw.saga
 
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.io.Buffer
 import kotlinx.io.Sink
+import kotlinx.io.readString
+import kotlinx.io.writeString
 import kotlin.concurrent.atomics.AtomicLong
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
@@ -147,9 +150,9 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
 
 
     fun content(entity: Entity): String {
-        val result = StringBuilder()
+        val result = Buffer()
         content(result, nodes[entity.uid]!!, 0)
-        return result.toString()
+        return result.readString()
     }
 
     fun content(sink: Sink) {
@@ -160,7 +163,7 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
         return content(entity)
     }
 
-    internal fun content(builder: StringBuilder, node: Node, spaces: Int) {
+    internal fun content(sink: Sink, node: Node, spaces: Int) {
         val name = node.entity.tag.toString()
 
         val space = if (spaces > 0) "  ".repeat(spaces) else ""
@@ -171,28 +174,28 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
             if (attributes.isEmpty()) {
                 val data = node.getData()
                 if (!data.isEmpty()) {
-                    builder.appendLine("$space<$name>$data</$name>")
+                    sink.writeString("$space<$name>$data</$name>\n")
                 } else {
-                    builder.appendLine("$space<$name/>")
+                    sink.writeString("$space<$name/>\n")
                 }
             } else {
                 val data = node.getData()
                 if (!data.isEmpty()) {
-                    builder.appendLine("$space<$name$attributes>$data</$name>")
+                    sink.writeString("$space<$name$attributes>$data</$name>\n")
                 } else {
-                    builder.appendLine("$space<$name$attributes/>")
+                    sink.writeString("$space<$name$attributes/>\n")
                 }
             }
         } else {
             if (attributes.isEmpty()) {
-                builder.appendLine("$space<$name>")
+                sink.writeString("$space<$name>\n")
             } else {
-                builder.appendLine("$space<$name$attributes>")
+                sink.writeString("$space<$name$attributes>\n")
             }
             node.getChildren().forEach { entity ->
-                content(builder, node(entity), spaces + 1)
+                content(sink, node(entity), spaces + 1)
             }
-            builder.appendLine("$space</$name>")
+            sink.writeString("$space</$name>\n")
         }
 
     }
