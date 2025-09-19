@@ -42,7 +42,7 @@ open class Node(val entity: Entity) {
         }
     }
 
-    internal fun addAttributes(attrs: Map<Key, Value>) {
+    internal fun setAttributes(attrs: Map<Key, Value>) {
         _attributes.update {
             val map = _attributes.value.toMutableMap()
             attrs.forEach { (key, value) ->

@@ -28,6 +28,8 @@ class ModelTest {
         val child = model.createEntity("child".toTag(), a, mapOf())
         model.createEntity("text".toTag(), child, "hello \n moin \t dddddd")
 
+        model.setAttributes(child, mapOf("t".toKey() to "z".toValue()))
+
         println(model.content())
         val buffer = Buffer()
         model.content(buffer)

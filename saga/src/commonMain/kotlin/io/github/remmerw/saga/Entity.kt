@@ -34,7 +34,7 @@ value class Value(private val data: String) {
         require(data.hasLineSeparator()) { "no line separators allowed" }
     }
 
-    fun toData() : ByteArray{
+    fun toData(): ByteArray {
         return data.encodeToByteArray()
     }
 

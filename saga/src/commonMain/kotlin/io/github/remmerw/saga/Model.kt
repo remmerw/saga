@@ -65,8 +65,11 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
     }
 
     fun setAttribute(entity: Entity, key: Key, value: Value) {
-        require(entity != this.entity) { "Model does not have attributes" }
         (nodes[entity.uid]!!).setAttribute(key, value)
+    }
+
+    fun setAttributes(entity: Entity, attributes: Map<Key, Value>) {
+        (nodes[entity.uid]!!).setAttributes(attributes)
     }
 
     fun createEntity(
@@ -76,7 +79,7 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
     ): Entity {
         val parent = nodes[parent.uid]!!
         val child = createNode(tag)
-        child.addAttributes(attributes)
+        child.setAttributes(attributes)
         parent.appendChild(child)
         return child.entity
     }
@@ -108,7 +111,7 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
         attributes: Map<Key, Value> = mapOf()
     ): Entity {
         val child = createNode(tag)
-        child.addAttributes(attributes)
+        child.setAttributes(attributes)
         appendChild(child)
         return child.entity
     }
