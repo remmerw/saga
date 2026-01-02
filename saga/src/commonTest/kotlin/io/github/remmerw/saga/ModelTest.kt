@@ -176,7 +176,7 @@ class ModelTest {
 
 
         launch {
-            repeat(10) { i ->
+            repeat(10) { _ ->
                 val hello = model.createEntity(
                     tag = "a".toTag(),
                     attributes = mapOf("a".toKey() to "b".toValue(), "c".toKey() to "d".toValue())
@@ -188,7 +188,7 @@ class ModelTest {
 
 
         launch(Dispatchers.Default) {
-            repeat(10) { i ->
+            repeat(10) { _ ->
                 val hello = model.createEntity(
                     tag = "b".toTag(),
                     attributes = mapOf("a".toKey() to "b".toValue(), "c".toKey() to "d".toValue())
@@ -198,7 +198,7 @@ class ModelTest {
         }
 
         launch {
-            repeat(10) { i ->
+            repeat(10) { _ ->
                 val hello = model.createEntity(
                     tag = "c".toTag(),
                     attributes = mapOf("a".toKey() to "b".toValue(), "c".toKey() to "d".toValue())
@@ -208,13 +208,13 @@ class ModelTest {
         }
 
         launch {
-            model.data(model.entity).collect { value ->
+            model.data(model.entity).collect { _ ->
                 cancel()
             }
         }
 
         launch {
-            model.attributes(model.entity).collect { value ->
+            model.attributes(model.entity).collect { _ ->
                 cancel()
             }
         }
