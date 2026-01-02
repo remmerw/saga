@@ -27,7 +27,7 @@ class Model(tag: Tag) : Node(Entity(0, tag)) {
     }
 
     internal fun addNode(node: Node) {
-        nodes.put(node.entity.uid, node)
+        nodes[node.entity.uid] = node
     }
 
     @OptIn(ExperimentalAtomicApi::class)

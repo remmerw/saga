@@ -37,7 +37,7 @@ open class Node(val entity: Entity) {
     internal fun setAttribute(key: Key, value: Value) {
         _attributes.update {
             val map = _attributes.value.toMutableMap()
-            map.put(key, value)
+            map[key] = value
             map
         }
     }
@@ -46,7 +46,7 @@ open class Node(val entity: Entity) {
         _attributes.update {
             val map = _attributes.value.toMutableMap()
             attrs.forEach { (key, value) ->
-                map.put(key, value)
+                map[key] = value
             }
             map
         }
