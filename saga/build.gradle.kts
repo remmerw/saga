@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.remmerw"
-version = "0.1.9"
+version = "0.2.0"
 
 
 kotlin {
@@ -45,7 +45,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }

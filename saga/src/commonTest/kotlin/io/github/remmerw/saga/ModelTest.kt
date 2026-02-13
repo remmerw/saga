@@ -67,11 +67,10 @@ class ModelTest {
 
 
         val name = "hello".toTag()
-        checkNotNull(name)
+        assertNotNull(name.toString())
 
         val data = "hello".toValue()
-        checkNotNull(data)
-
+        assertNotNull(data.toString())
 
         try {
             "hello2".toTag()

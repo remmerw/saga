@@ -42,18 +42,22 @@ value class Value(private val data: String) {
         return data
     }
 
+    @Suppress("unused")
     fun toFloat(): Float {
         return data.toFloat()
     }
 
+    @Suppress("unused")
     fun toLong(): Long {
         return data.toLong()
     }
 
+    @Suppress("unused")
     fun toInt(): Int {
         return data.toInt()
     }
 
+    @Suppress("unused")
     fun toBoolean(): Boolean {
         return data.toBoolean()
     }

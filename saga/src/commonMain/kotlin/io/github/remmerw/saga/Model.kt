@@ -10,6 +10,7 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
 
 
+@Suppress("SameParameterValue")
 class Model(tag: Tag) : Node(Entity(0, tag)) {
 
     @OptIn(ExperimentalAtomicApi::class)

@@ -244,7 +244,7 @@ class Parser(val model: Model) {
                         return TOKEN_BEGIN_ELEMENT
                     } finally {
                         // This can inform elements to continue with notifications.
-                        // It can also cause Javascript to be loaded / processed.
+                        // It can also cause JavaScript to be loaded / processed.
 
                     }
                 }
@@ -636,7 +636,7 @@ class Parser(val model: Model) {
         while (true) {
             val chInt = reader.readCodePointValue()
             if (chInt == -1) {
-                if ((attributeName != null) && (attributeName.isNotEmpty())) {
+                if (!attributeName.isNullOrEmpty()) {
                     val attributeNameStr = attributeName.toString()
                     element.setAttribute(attributeNameStr.toKey(), attributeNameStr.toValue())
                     attributeName.setLength(0)
@@ -651,7 +651,7 @@ class Parser(val model: Model) {
                 lastCharSlash = false
                 break
             } else if (ch == '>') {
-                if ((attributeName != null) && (attributeName.isNotEmpty())) {
+                if (!attributeName.isNullOrEmpty()) {
                     val attributeNameStr = attributeName.toString()
                     element.setAttribute(attributeNameStr.toKey(), attributeNameStr.toValue())
                 }
@@ -669,7 +669,7 @@ class Parser(val model: Model) {
                 lastCharSlash = false
                 if (blankFound) {
                     blankFound = false
-                    if ((attributeName != null) && (attributeName.isNotEmpty())) {
+                    if (!attributeName.isNullOrEmpty()) {
                         val attributeNameStr = attributeName.toString()
                         element.setAttribute(attributeNameStr.toKey(), attributeNameStr.toValue())
                         attributeName.setLength(0)
@@ -691,7 +691,7 @@ class Parser(val model: Model) {
             }
             val ch = chInt.toChar()
             if (ch == '>') {
-                if ((attributeName != null) && (attributeName.isNotEmpty())) {
+                if (!attributeName.isNullOrEmpty()) {
                     val attributeNameStr = attributeName.toString()
                     element.setAttribute(attributeNameStr.toKey(), attributeNameStr.toValue())
                 }
@@ -815,7 +815,7 @@ class Parser(val model: Model) {
     }
 
     companion object {
-        private val ENTITIES: MutableMap<String, Char> = HashMap<String, Char>(256)
+        private val ENTITIES: MutableMap<String, Char> = HashMap(256)
         private const val TOKEN_EOD = 0
         private const val TOKEN_COMMENT = 1
         private const val TOKEN_TEXT = 2
