@@ -942,7 +942,7 @@ class Parser(val model: Model) {
 
             // symbols from http://de.selfhtml.org/html/referenz/zeichen.htm
 
-            // greek letters
+            // Greek letters
             entities["Alpha"] = (913.toChar())
             entities["Beta"] = (914.toChar())
             entities["Gamma"] = (915.toChar())

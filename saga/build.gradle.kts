@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -15,7 +14,6 @@ kotlin {
         namespace = "io.github.remmerw.saga"
         compileSdk = 37
         minSdk = 27
-
 
 
         // Opt-in to enable and configure device-side (instrumented) tests

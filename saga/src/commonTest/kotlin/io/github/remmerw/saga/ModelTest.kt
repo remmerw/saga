@@ -18,17 +18,25 @@ class ModelTest {
     @Test
     fun parseTest() {
         val model = createModel("hello".toTag())
-        val a = model.createEntity("a".toTag(), mapOf(
-            "a".toKey() to 3F.toValue(),
-            "b".toKey() to true.toValue(),
-            "c".toKey() to 1L.toValue(),
-            "d".toKey() to 5.toValue(),
-            "e".toKey() to normalizeValue("hello \n zeit")))
 
-        model.createEntity("text".toTag(), "hello \n moin")
+        @Suppress(
+            "GrazieInspectionRunner", "GrazieInspectionRunner", "GrazieInspectionRunner",
+            "GrazieInspectionRunner", "GrazieInspectionRunner", "GrazieInspectionRunner",
+            "GrazieInspectionRunner", "GrazieInspectionRunner"
+        ) val a = model.createEntity(
+            "a".toTag(), mapOf(
+                "a".toKey() to 3F.toValue(),
+                "b".toKey() to true.toValue(),
+                "c".toKey() to 1L.toValue(),
+                "d".toKey() to 5.toValue(),
+                "e".toKey() to normalizeValue("hello \n time")
+            )
+        )
+
+        model.createEntity("text".toTag(), "hello \n world")
 
         val child = model.createEntity("child".toTag(), a, mapOf())
-        model.createEntity("text".toTag(), child, "hello \n moin \t dddddd")
+        model.createEntity("text".toTag(), child, "hello \n world \t dddddd")
 
         model.setAttributes(child, mapOf("t".toKey() to "z".toValue()))
 
@@ -45,8 +53,11 @@ class ModelTest {
         val model = createModel("hello".toTag())
 
         val bytes = Random.nextBytes(20)
-        model.createEntity("a".toTag(), mapOf(
-            "a".toKey() to bytes.toValue()))
+        model.createEntity(
+            "a".toTag(), mapOf(
+                "a".toKey() to bytes.toValue()
+            )
+        )
 
 
         println(model.content())
@@ -109,7 +120,7 @@ class ModelTest {
         assertNotNull(hello)
 
         val moin = model.createEntity(
-            tag = "moin".toTag(),
+            tag = "world".toTag(),
             parent = hello,
             attributes = mapOf("a".toKey() to "b".toValue(), "c".toKey() to "d".toValue())
         )
