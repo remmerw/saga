@@ -12,4 +12,4 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 [plugins]
 androidLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.36.0" }
+vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
